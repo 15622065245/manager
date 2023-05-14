@@ -1,0 +1,66 @@
+/*tab 标签*/
+.el-tabs__nav-wrap::after {
+  background-color: transparent;
+}
+.el-tabs__item.is-active {
+  color: #1C1715;
+  font-weight: bold;
+}
+.el-tabs__active-bar {
+  height: 3px;
+  background-color: #009688
+}
+.el-tabs__item {
+  font-size: 16px;
+}
+
+//switch
+.el-switch.is-checked .el-switch__core {
+  background-color: #009688;
+  border-color: #009688;
+}
+.el-switch__label.is-active {
+  color:  #009688;
+}
+/* switch按钮样式 */
+.el-switch__label {
+  position: absolute;
+  display: none;
+  color: #fff !important;
+}
+/*打开时文字位置设置*/
+.el-switch__label--right {
+  z-index: 1;
+}
+/* 调整打开时文字的显示位子 */
+.el-switch__label--right span{
+  margin-right: 9px;
+}
+/*关闭时文字位置设置*/
+.el-switch__label--left {
+  z-index: 1;
+}
+/* 调整关闭时文字的显示位子 */
+.el-switch__label--left span{
+  margin-left: 9px;
+}
+/*显示文字*/
+.el-switch__label.is-active {
+  display: block;
+}
+/* 调整按钮的宽度 */
+.el-switch .el-switch__core,
+.el-switch .el-switch__label {
+  width: 58px !important;
+  margin: 0;
+}
+
+
+
+//.el-pager
+.el-pager li.active {
+  color: #009688;
+}
+.el-pager li:hover {
+  color: #009688;
+}

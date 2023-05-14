@@ -1,0 +1,279 @@
+<template>
+        <el-row>
+            <el-col :span="24">
+                <search :search-items="searchItems" @on-search="searchBySearchItem"></search>
+            </el-col>
+            <el-col :span="24">
+                <el-button size="small" @click="addHandle">新建</el-button>
+            </el-col>
+            <el-col :span="24">
+                <el-table
+                        stripe
+                        :data="tableData"
+                        :header-cell-style="{background:'#f2f2f2'}"
+                        style="width: 100%">
+                    <el-table-column
+                            prop="username"
+                            label="账号"
+                            align="center"
+                            width="180">
+                    </el-table-column>
+                    <el-table-column
+                            prop="realname"
+                            label="姓名"
+                            align="center"
+                            width="180">
+                    </el-table-column>
+                    <el-table-column
+                            prop="phone"
+                            align="center"
+                            label="手机号">
+                    </el-table-column>
+                    <el-table-column
+                            prop="roleList"
+                            align="center"
+                            label="角色">
+                        <template slot-scope="scope">
+                            <span>
+                                <span v-for="item in scope.row.roleList">{{item.name}};</span>
+                            </span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="createtime"
+                            align="center"
+                            label="创建时间">
+                    </el-table-column>
+                    <el-table-column
+                            prop="enabled"
+                            align="center"
+                            label="状态">
+                        <template slot-scope="scope">
+                            <el-switch
+                                    :value="scope.row.enabled"
+                                    active-text="启用"
+                                    inactive-text="禁用"
+                                    @change="enabledChange(scope.row)">
+                            </el-switch>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="option"
+                            align="center"
+                            label="操作"
+                            width="280">
+                        <template slot-scope="scope">
+                            <el-button size="small" class="optionButton" @click="editHandle(scope.row.id)">编辑</el-button>
+                            <el-button size="small" class="optionButton" @click="roleHandle(scope.row.id)">角色设置</el-button>
+                            <el-button size="small" class="optionButton" @click="deleteHandle(scope.row.id)">删除</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-col>
+            <el-col :span="24">
+                <div class="pager-group" style="float: left">
+                    <el-pagination
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page="page"
+                            :page-sizes="[10, 20, 50, 100]"
+                            :page-size="10"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            :total="total">
+                    </el-pagination>
+                </div>
+            </el-col>
+            <!-- 新增目录弹框-->
+            <Icreate :dialog-visible="createVisible" @on-dialog-close="handleClose" @onRefreshData="find"></Icreate>
+            <!-- 修改目录弹框-->
+            <Iedit :dialog-visible="editVisible" :editData="rowData" @on-dialog-close="handleClose" @onRefreshData="find"></Iedit>
+            <RoleSetting :dialog-visible="roleVisible" :roleId="roleId" @on-dialog-close="handleClose" @onRefreshData="find"></RoleSetting>
+            <!-- 删除弹框-->
+            <el-dialog
+                    title="删除"
+                    :visible.sync="deleteVisible"
+                    width="30%">
+                <div style="display: flex;align-items: center">
+                    <span style="margin-left: 20px">删除后不可恢复，是否确定删除?</span>
+                </div>
+                <span slot="footer" class="dialog-footer">
+            <el-button size="small" @click="deleteVisible = false">取 消</el-button>
+            <el-button size="small" type="primary" @click="deleteConfirm">确 定</el-button>
+          </span>
+            </el-dialog>
+        </el-row>
+
+</template>
+
+<script>
+    import Icreate from "./create";
+    import Iedit from "./edit";
+    import RoleSetting from "./role-setting";
+    import Search from '@/framework/components/search'
+    import { findByTable, count, deleteAccount, enableAccount } from "../../service/account";
+
+
+    export default {
+        name: "account",
+        components:{
+            Icreate,
+            Iedit,
+            RoleSetting,
+            Search
+        },
+        data() {
+            return {
+                tableData: [],
+                searchItems: [{
+                    name: '名称',
+                    key: 'username',
+                    type: 'string'
+                },
+                {
+                    name: '角色',
+                    key: 'type',
+                    type: 'select',
+                    displayValue: ['人事', '运营', '财务', '客服主管'],
+                    value: ['人事', '运营', '财务', '客服主管']
+                },
+                {
+                    name: '状态',
+                    key: 'enabled',
+                    type: 'select',
+                    displayValue: ['禁用', '启用'],
+                    value: [false, true]
+                },
+                {
+                    name: '创建时间',
+                    key: 'creationTime',
+                    type: 'datetimerange',
+                }],
+                createVisible: false,
+                editVisible: false,
+                deleteVisible: false,
+                roleVisible: false,
+                total: 0,
+                searchParams: {},
+                page: 1,
+                pageSize: 10,
+                rowData: null,
+                deleteId: 0,
+                searchData: [],// 搜索
+                roleId: 0
+            }
+        },
+        mounted() {
+            this.find()
+        },
+        methods: {
+            // 搜索
+            searchBySearchItem(val) {
+                console.log("val", val)
+                this.searchData = val
+                this.page = 1
+                this.find()
+            },
+            find() {
+                let param = {
+                    manager:{
+                    },
+                    role:{
+                    },
+                    creationTime:{
+                    },
+                    pageable:{
+                        page: this.page,
+                        size: this.pageSize,
+                        sort:"id",
+                        desc:true
+                    }
+                }
+                if (this.searchData.username) {
+                    param.manager.username = this.searchData.username
+                }
+                if (this.searchData.enabled !== undefined && this.searchData.enabled !== '' && this.searchData.enabled !== -1) {
+                    param.manager.enabled = this.searchData.enabled
+                }
+                if (this.searchData.role) {
+                    param.role.id = this.searchData.role
+                }
+                if (this.searchData.creationTime) {
+                    param.creationTime = {
+                        start: this.searchData.creationTime[0],
+                        end: this.searchData.creationTime[1]
+                    }
+                }
+                findByTable(param, res => {
+                    res.forEach(item => {
+                        item.id = item.id.toString()
+                    })
+                    this.tableData = res
+                })
+                count(param, res => {
+                    this.total = res
+                })
+            },
+            handleSizeChange(pageSize) {
+                this.pageSize = pageSize
+                this.find()
+            },
+            handleCurrentChange(page) {
+                this.page = page
+                this.find()
+            },
+            addHandle() {
+                this.createVisible = true
+            },
+            enabledChange(row) {
+                let params = {
+                    id: row.id,
+                    enabled: !row.enabled
+                }
+                this.$confirm(`确定${!row.enabled ? '启用' : '禁用'}吗?`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(() => {
+                    enableAccount(params, res => {
+                        this.$message.success(`${!row.enabled ? '启用' : '禁用'}成功！`)
+                        this.find()
+                    })
+                }).catch(() => {
+                })
+            },
+            editHandle(id) {
+                this.rowData = id
+                this.editVisible = true
+            },
+            deleteHandle(id) {
+                console.log(id)
+                this.deleteId = id
+                this.deleteVisible = true
+            },
+            deleteConfirm() {
+                deleteAccount({id: this.deleteId}, res => {
+                    if (res === 204) {
+                        this.$message.success("删除成功")
+                        this.deleteVisible = false
+                        this.find()
+                    }
+                })
+            },
+            roleHandle(id) {
+                this.roleId = id
+              this.roleVisible = true
+            },
+            handleClose() {
+                this.createVisible = false
+                this.editVisible = false
+                this.roleVisible = false
+            },
+
+        }
+    }
+</script>
+
+<style lang="less" scoped>
+
+</style>

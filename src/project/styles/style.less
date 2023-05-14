@@ -1,0 +1,265 @@
+// 抖动动画
+@keyframes wobble {
+  0%,
+  10%,
+  20%,
+  30%,
+  40%,
+  50%,
+  60%,
+  70%,
+  80%,
+  90%,
+  100% {
+    transform: translateX(-2%)
+  }
+  5%,
+  15%,
+  25%,
+  35%,
+  45%,
+  55%,
+  65%,
+  75%,
+  85%,
+  95% {
+    transform: translateX(2%)
+  }
+}
+.el-image-viewer__close {
+  top: 55px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial,
+  sans-serif;
+}
+.quill-editor {
+  .ql-container {
+    height: 200px;
+  }
+}
+.amap-sug-result {
+  z-index: 9999!important;
+}
+// list页面公共样式
+.page {
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  .search-wrapper {
+    width: 100%;
+  }
+  .btn-page-wrapper {
+    margin: 10px 0;
+    width: 100%;
+    .more-btn {
+      background: #3e5265;
+      color: white;
+    }
+  }
+  .amount-wrapper {
+    width: 100%;
+    margin: 20px auto;
+    display: flex;
+    .amount-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      margin: 0 15px;
+      border: 1px dashed #ccc;
+      border-radius: 3px;
+      box-shadow: 1px 1px 5px 1px rgba(0, 161, 108, 0.1);
+      height: 100px;
+      &:first-child {
+        margin-left: 0;
+      }
+      &:last-child {
+        margin-right: 0;
+      }
+      .title {
+        font-weight: 600;
+      }
+      .value {
+        font-weight: 700;
+        font-size: 22px;
+      }
+    }
+  }
+  .el-table {
+    // 超出长度时省略号显示单元格内容
+    .cell {
+      line-height: 35px;
+    }
+    .ellipsis {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      word-break: break-all;
+    }
+    .button-ellipsis {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      word-break: break-all;
+      width: 140px;
+      text-align: left;
+    }
+  }
+}
+
+// 详情页面公共样式
+.page {
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  .left-card {
+    padding-right: 10px;
+    box-sizing: border-box;
+    .box-card {
+      margin-bottom: 10px;
+      .box-card-header {
+        display: flex;
+        align-items: center;
+        .box-card-header-left {
+          font-size: 14px;
+        }
+        .box-card-header-right {
+          flex: 1;
+          display: flex;
+          justify-content: flex-end;
+        }
+      }
+      .text-item {
+        padding: 5px 0;
+        word-break: break-all;
+        &.avatar {
+          display: flex;
+          align-items: center;
+          .el-image {
+            width: 60px;
+            height: 60px;
+            border-radius:50%;
+          }
+        }
+        &.image .el-image {
+          display: block;
+          width: 80%;
+          margin: 10px auto;
+        }
+        .text-label {
+          font-weight: bold;
+        }
+        .text {
+          word-break: break-all;
+        }
+      }
+    }
+  }
+  .right-card {
+    box-sizing: border-box;
+    .box-card {
+      margin-bottom: 10px;
+      .text-wrapper {
+        font-size: 14px;
+        font-weight: 700;
+        span {
+          margin-left: 10px;
+          &:first-child {
+            margin: 0;
+          }
+        }
+      }
+      .box-card-header {
+        display: flex;
+        align-items: center;
+        .box-card-header-left {
+          font-size: 14px;
+        }
+        .box-card-header-right {
+          flex: 1;
+          display: flex;
+          justify-content: flex-end;
+        }
+      }
+      .table-data {
+        margin-top: 10px;
+      }
+      .text-item {
+        padding: 5px 0;
+        &.avatar {
+          display: flex;
+          align-items: center;
+        }
+        &.image .el-image {
+          display: block;
+          width: 80%;
+          margin: 10px auto;
+        }
+        .text-label {
+          font-weight: bold;
+        }
+        .text {
+          word-break: break-all;
+        }
+      }
+    }
+  }
+}
+
+// tab面板的公共样式
+.tab-wrapper {
+  .search-wrapper {
+    margin: 10px auto;
+    width: 100%;
+  }
+  .btn-wrapper {
+    margin: 10px auto;
+    width: 100%;
+    .more-btn {
+      background: #3e5265;
+      color: white;
+    }
+  }
+  .table {
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+.el-card/deep/.el-card__header {
+  padding: 10px 18px;
+  font-weight: bolder;
+}
+
+/**
+ * @author: chenwei
+ * @Date: 2020-09-09 19:24:45
+ * @description: 解决表格浮动列透明
+ */
+.el-table/deep/.el-table__body tbody {
+  background: #fff;
+}
+
+/**
+  日期选择器的输入框样式
+ */
+.el-date-range-picker__time-picker-wrap,
+.el-date-picker__editor-wrap {
+  .el-input {
+    width: 142px !important;
+  }
+  .el-date-range-picker__editor {
+    .el-input__inner {
+      width: 142px !important;
+      font-size: 12px !important;
+    }
+  }
+}

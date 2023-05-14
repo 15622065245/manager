@@ -1,0 +1,68 @@
+.el-table td, .el-table th{
+  padding: 5px 0;
+}
+.el-table th, .el-table tr{
+  background: none;
+}
+.el-table thead{
+  color: #333333;
+  background: #f5f7fa;
+}
+.el-popper[x-placement^=bottom]{
+  margin-top: 0;
+}
+
+.pager-group{
+  display: inline-block;
+  float: right;
+}
+
+
+/* table*/
+.el-table .el-table__cell {
+  padding: 8px;
+  font-size: 14px;
+}
+.el-table td.el-table__cell{
+  border-bottom: none;
+}
+.el-table--border::after, .el-table--group::after, .el-table::before {
+  background-color: transparent;
+}
+
+
+.el-table__body-wrapper::-webkit-scrollbar {
+  width: 0px;
+  ///*纵向滚动条*/
+  //width: 10px;
+  ///*横向滚动条*/
+  //height: 10px;
+  //margin-right: -20px;
+}
+
+.el-table__body-wrapper::-webkit-scrollbar-thumb {
+  /*滚动条滑块颜色*/
+  background-color: #c1c1c1;
+  border-radius: 5px;
+}
+
+.el-table__body-wrapper::-webkit-scrollbar-track {
+  /*滚动条背景色*/
+  background-color: #f2f2f2;
+}
+
+.el-table__body-wrapper::-webkit-scrollbar-corner {
+  /*表格滚动条角落*/
+  background-color: #ffa00b;
+}
+.el-table{
+  width: 100%;
+}
+.el-table__header-wrapper table,.el-table__body-wrapper table{
+  width: 100% !important;
+}
+.el-table__body, .el-table__footer, .el-table__header{
+  table-layout: auto;
+}
+
+

@@ -1,0 +1,35 @@
+[
+  {
+    "displayName": "圈子主页",
+    "icon": "el-icon-setting",
+    "mid": 1,
+    "children": [
+      {
+        "displayName": "圈子首页",
+        "link": "/organizationHomePage/list",
+        "mid": 0
+      },
+      {
+        "displayName": "管理员管理",
+        "link": "/adminManagement/list",
+        "mid": 0
+      },
+      {
+        "displayName": "审核圈子申请",
+        "link": "/reviewOrganizationApplication/list",
+        "mid": 0
+      },
+      {
+        "displayName": "圈子视频管理",
+        "link": "/organizingVideoManagement/list",
+        "mid": 0
+      }
+    ]
+  },
+  {
+    "displayName": "圈子成员管理",
+    "icon": "el-icon-setting",
+    "mid": 1,
+    "link": "/organizationMemberManagement/list"
+  }
+]
