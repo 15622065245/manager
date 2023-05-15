@@ -14,10 +14,11 @@
                     <upload
                             @on-transport-file-list="handleTransportFileList"
                             @handleRemove="handleRemove"
-                            :file-list="form.avatarSmall ? form.avatarSmall.split(';') : []"
+                            :file-list="form.SharePoster ? form.SharePoster.split(';') : []"
                             @handleSuccess="handleSuccess"
                             :max-size="5120"
-                            :limit="9"
+                            :limit="1"
+                            v-if="isFinished"
                     ></upload>
                 </el-form-item>
 
@@ -31,16 +32,14 @@
 </template>
 
 <script>
+    import { find, update } from "../../service/dictionary";
     import Upload from '@/framework/components/upload'
     export default {
         name: "create",
         data() {
             return {
-                form: {
-                    name: "",
-                    superior: "",
-                    desc: "",
-                },
+                form: {},
+                isFinished: false
             }
         },
         components:{
@@ -55,25 +54,58 @@
                 type: String,
             }
         },
+        watch: {
+          dialogVisible(val) {
+              if (val) {
+                  this.findData()
+              }
+          }
+        },
         methods: {
+            findData() {
+                find({}, res => {
+
+                    const obj = res.reduce((acc, cur) => {
+                        acc[cur.name] = cur.value;
+                        return acc;
+                    }, {});
+                    this.form = obj
+                    this.isFinished = true
+                    console.log("this.form", this.form)
+                })
+            },
             handleClose() {
                 this.$emit('on-dialog-close')
             },
             handleConfirm() {
-
+                let param = {
+                    name:  "SharePoster",
+                    value: this.form.SharePoster
+                }
+                update(param, res => {
+                    if (res === 204) {
+                        this.$message.success("设置成功！")
+                        this.$emit('on-dialog-close')
+                    }
+                })
             },
             handleTransportFileList(fileList) {
                 if (fileList.length > 0) {
-                    this.form.avatar = fileList[0].response.data
+                    this.form.SharePoster = fileList[0].response
                 } else {
-                    this.form.avatar = ''
+                    this.form.SharePoster = ''
                 }
             },
             handleRemove() {
-                this.form.avatar = ''
+                this.form.SharePoster = ''
             },
-            handleSuccess(res) {
-                this.form.avatar = res.path
+            handleSuccess(fileList) {
+                console.log("fileList11", fileList)
+                if (fileList.length > 0) {
+                    this.form.SharePoster = fileList[0].response
+                } else {
+                    this.form.SharePoster = ''
+                }
             },
         }
     }
