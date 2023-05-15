@@ -239,9 +239,9 @@ export default {
             this.$message.success('退出成功')
             // 清除缓存
             sessionStorage.removeItem('console_cache')
-            localStorage.removeItem('IMinfo')
-            sessionStorage.removeItem('console_token')
-            localStorage.removeItem('currentChatId')
+            localStorage.removeItem('menuList')
+            sessionStorage.removeItem('store_token')
+            // localStorage.removeItem('currentChatId')
             sessionStorage.clear()
             // 退出环信
             // this.$imconn.close()

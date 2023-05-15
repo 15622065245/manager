@@ -13,8 +13,8 @@
                 <el-form-item label="账号" prop="username">
                     <el-input disabled v-model="form.username" placeholder="请输入" style="width: 95%"></el-input>
                 </el-form-item>
-                <el-form-item label="密码" prop="password">
-                    <el-input disabled v-model="form.password" placeholder="请输入" style="width: 95%"></el-input>
+                <el-form-item label="姓名" prop="realname">
+                    <el-input disabled v-model="form.realname" placeholder="请输入" style="width: 95%"></el-input>
                 </el-form-item>
                 <el-form-item label="角色" prop="value">
                     <el-transfer v-model="transferData" :data="data"
@@ -47,7 +47,7 @@
                         username: [
                             { required: true, message: '请输入账号', trigger: 'blur' },
                         ],
-                        password: [
+                        realname: [
                             { required: true, message: '请输入密码', trigger: 'blur' },
                         ],
                         value: [
@@ -100,6 +100,8 @@
                 })
                 //回显角色
                 get({id: this.roleId}, res =>{
+                    this.form.username = res.username
+                    this.form.realname = res.realname
                     let arr = []
                     res.roleList.forEach(item => {
                         arr.push(item.id.toString())
