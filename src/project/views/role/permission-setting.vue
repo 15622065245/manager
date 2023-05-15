@@ -17,6 +17,7 @@
                         node-key="id"
                         ref="tree"
                         highlight-current
+                        :default-checked-keys="checkedKeys"
                         :props="defaultProps">
                 </el-tree>
             </el-form>
@@ -30,108 +31,21 @@
 </template>
 
 <script>
+    import { findByAccountTypeAndClient, findByRoleAndClient } from "../../service/module"
+    import { updateModule } from "../../service/role";
+
     export default {
         name: "create",
         data() {
                 return {
-                    form: {
-                        name: "",
-                        superior: "",
-                        desc: "",
-                    },
-                    data: [{
-                        id: 1,
-                        label: '系统管理',
-                        children: [{
-                            id: 8,
-                            label: '管理员管理'
-                        }, {
-                            id: 9,
-                            label: '角色权限'
-                        }, {
-                            id: 10,
-                            label: '基本参数'
-                        }]
-                    }, {
-                        id: 2,
-                        label: '用户管理',
-                        children: [{
-                            id: 11,
-                            label: '用户列表'
-                        }, {
-                            id: 12,
-                            label: '身份认证列表'
-                        }]
-                    }, {
-                        id: 3,
-                        label: '作品管理',
-                        children: [{
-                            id: 13,
-                            label: '模特作品列表'
-                        }, {
-                            id: 14,
-                            label: '摄影师作品列表'
-                        }, {
-                            id: 15,
-                            label: '场地作品列表'
-                        }, {
-                            id: 16,
-                            label: '模特作品审核列表'
-                        }, {
-                            id: 17,
-                            label: '摄影师作品审核列表'
-                        }, {
-                            id: 18,
-                            label: '场地作品审核列表'
-                        }]
-                    },{
-                        id: 4,
-                        label: '作品属性管理',
-                        children: [{
-                            id: 19,
-                            label: '作品风格管理'
-                        }, {
-                            id: 20,
-                            label: '作品衣品管理'
-                        }]
-                    },{
-                        id: 5,
-                        label: '内容管理',
-                        children: [{
-                            id: 21,
-                            label: '系统文章管理'
-                        }, {
-                            id: 22,
-                            label: '帮助文章管理'
-                        }]
-                    },{
-                        id: 6,
-                        label: '广告管理',
-                        children: [{
-                            id: 23,
-                            label: 'banner广告管理'
-                        }, {
-                            id: 24,
-                            label: '启动页广告管理'
-                        }]
-                    },{
-                        id: 7,
-                        label: '互动管理',
-                        children: [{
-                            id: 25,
-                            label: '意见反馈'
-                        }, {
-                            id: 26,
-                            label: '客服留言'
-                        }, {
-                            id: 27,
-                            label: '举报列表'
-                        }]
-                    },],
+                    form: {},
+                    data: [],
                     defaultProps: {
                         children: 'children',
-                        label: 'label'
-                    }
+                        label: 'name'
+                    },
+                    checkedKeys: [],
+                    parentIdArr: []
             }
         },
         props: {
@@ -139,49 +53,78 @@
                 type: Boolean,
                 default: false,
             },
+            roleId: {
+                type: String
+            }
+        },
+        watch:{
+          dialogVisible(val) {
+              if (val) {
+                  this.find()
+              }
+          }
         },
         methods: {
+            find() {
+                findByAccountTypeAndClient({accountType: 'MANAGER', client: 'MANAGER_WEB'}, res => {
+                    res.forEach(item => {
+                        this.parentIdArr.push(item.id);
+                    })
+                    this.data = res
+                    this.findByRoleId()
+                    console.log("Res列表", res)
+                })
+
+            },
+            findByRoleId() {
+                let param = {
+                    role: {
+                        id: this.roleId
+                    },
+                    client: "MANAGER_WEB"
+                }
+                findByRoleAndClient(param, res => {
+                    console.log("我的模块", res)
+                    console.log(this.parentIdArr)
+                    let arr = res.filter(item => {
+                        //如果勾选到父节点，则会全部回显它的子节点，所以要排除
+                        return !this.parentIdArr.includes(item.id)
+                        // return item.id.toString()
+                    })
+                    console.log("arr",arr)
+                    this.checkedKeys = arr.map(val => val.id.toString())
+                    console.log("this.checkedKeys", this.checkedKeys)
+                })
+            },
             handleCheckChange(data, checked, indeterminate) {
                 console.log(data, checked, indeterminate);
             },
             handleNodeClick(data) {
                 console.log(data);
             },
-            loadNode(node, resolve) {
-                if (node.level === 0) {
-                    return resolve([{name: 'region1'}, {name: 'region2'}]);
-                }
-                if (node.level > 3) return resolve([]);
-
-                var hasChild;
-                if (node.data.name === 'region1') {
-                    hasChild = true;
-                } else if (node.data.name === 'region2') {
-                    hasChild = false;
-                } else {
-                    hasChild = Math.random() > 0.5;
-                }
-
-                setTimeout(() => {
-                    var data;
-                    if (hasChild) {
-                        data = [{
-                            name: 'zone' + this.count++
-                        }, {
-                            name: 'zone' + this.count++
-                        }];
-                    } else {
-                        data = [];
-                    }
-
-                    resolve(data);
-                }, 500);
-            },
             handleClose() {
                 this.$emit('on-dialog-close')
             },
             handleConfirm() {
-
+                let list = this.$refs.tree.getCheckedNodes().concat(this.$refs.tree.getHalfCheckedNodes())
+                let idList = []
+                list.forEach(item => {
+                    idList.push({id: item.id.toString()})
+                })
+                let param = {
+                    role: {
+                        id: this.roleId
+                    },
+                    moduleList: idList
+                }
+                updateModule(param, res => {
+                    if (res === 204) {
+                        this.$message.success("权限设置成功！")
+                        this.$emit("on-dialog-close")
+                    }
+                })
+                console.log("list", list)
+                console.log("idList", idList)
             },
             handleEdit(index, row) {
                 console.log(index, row);
