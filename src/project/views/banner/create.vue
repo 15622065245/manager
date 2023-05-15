@@ -9,45 +9,49 @@
                 v-dialogDrag
                 :close-on-click-modal="false"
         >
-                    <el-form ref="form" :model="form" label-width="100px">
-                        <el-form-item label="广告位">
-                            <el-input v-model="form.name" placeholder="请输入" style="width: 95%"></el-input>
+                    <el-form ref="formValidate" :rules="rules" :model="form" label-width="100px">
+                        <el-form-item label="广告位" prop="location">
+                            <el-input disabled v-model="form.location" placeholder="请输入" style="width: 95%"></el-input>
                         </el-form-item>
-                        <el-form-item label="广告标题">
-                            <el-input v-model="form.name" placeholder="请输入" style="width: 95%"></el-input>
+                        <el-form-item label="广告标题" prop="title">
+                            <el-input v-model="form.title" placeholder="请输入" style="width: 95%"></el-input>
                         </el-form-item>
-                        <el-form-item label="广告图片">
+                        <el-form-item label="广告图片" prop="image">
                             <upload
                                     @on-transport-file-list="handleTransportFileList"
                                     @handleRemove="handleRemove"
-                                    :file-list="form.avatarSmall ? form.avatarSmall.split(';') : []"
+                                    :file-list="form.image ? form.image.split(';') : []"
                                     @handleSuccess="handleSuccess"
                                     :max-size="5120"
                                     :limit="1"
                             ></upload>
                             <span>建议尺寸： 750*300</span>
                         </el-form-item>
-                        <el-form-item label="开始时间">
+                        <el-form-item label="开始时间" prop="effectiveTime">
                             <el-date-picker
-                                    v-model="form.value1"
+                                    v-model="form.effectiveTime"
+                                    value-format="yyyy-MM-dd HH:mm:ss"
+                                    format="yyyy-MM-dd HH:mm:ss"
                                     type="datetime"
                                     placeholder="选择日期时间">
                             </el-date-picker>
                         </el-form-item>
-                        <el-form-item label="结束时间">
+                        <el-form-item label="结束时间" prop="expirationTime">
                             <el-date-picker
-                                    v-model="form.value2"
+                                    v-model="form.expirationTime"
+                                    value-format="yyyy-MM-dd HH:mm:ss"
+                                    format="yyyy-MM-dd HH:mm:ss"
                                     type="datetime"
                                     placeholder="选择日期时间">
                             </el-date-picker>
                         </el-form-item>
-                        <el-form-item label="排序数值">
-                            <el-input v-model="form.name" placeholder="请输入" style="width: 95%"></el-input>
+                        <el-form-item label="排序数值" prop="position">
+                            <el-input v-model="form.position" placeholder="请输入" style="width: 95%"></el-input>
                         </el-form-item>
-                        <el-form-item label="跳转类型">
-                            <el-radio v-model="form.status" label="1">作品详情</el-radio>
-                            <el-radio v-model="form.status" label="2">图文详情</el-radio>
-                            <el-radio v-model="form.status" label="3">用户主页</el-radio>
+                        <el-form-item label="跳转类型" prop="type">
+                            <el-radio v-model="form.type" label="work">作品详情</el-radio>
+                            <el-radio v-model="form.type" label="content">图文详情</el-radio>
+                            <el-radio v-model="form.type" label="user">用户主页</el-radio>
                         </el-form-item>
                     </el-form>
 
@@ -56,41 +60,57 @@
                 <el-button size="small" @click="handleClose">取消</el-button>
             </div>
         </el-dialog>
+        <selectWorks :dialogVisible="seletctDialogVisible" @on-dialog-close="seletctHandleClose" @selectWork="selectWork"></selectWorks>
     </div>
 </template>
 
 <script>
     import Upload from '@/framework/components/upload'
+    import selectWorks from "./select-works"
+    import { saveSlide } from "../../service/advertising";
+
     export default {
         name: "create",
         components: {
             Upload,
+            selectWorks
         },
         data() {
+            const avatarValidate = (rule, value, callback) => {
+                if (this.form.image === '') {
+                    callback('请上传头像')
+                } else {
+                    callback()
+                }
+            }
             return {
-                activeName: 'first',
                 form: {
-                    name: "",
-                    superior: "",
-                    desc: "",
+                    location: "banner"
                 },
-                dynamicValidateForm: {
-                    domains: [{
-                        value: ''
-                    }],
-                    email: ''
-                },
-                tableData: [{
-                    name: '财务系统',
-                    desc: '-'
-                }, {
-                    name: '采购系统',
-                    desc: '-'
-                },],
-                addDialogVisible: false,
-                addForm:{
-                    name: "",
-                    desc:""
+                seletctDialogVisible: false,
+                workId: "",
+                rules: {
+                    location: [
+                        { required: true, message: "请输入", trigger: "blur" }
+                    ],
+                    title: [
+                        { required: true, message: "请输入", trigger: "blur" }
+                    ],
+                    image: [
+                        { required: true, validator: avatarValidate }
+                    ],
+                    position: [
+                        { required: true, message: "请输入", trigger: "change" }
+                    ],
+                    effectiveTime: [
+                        { required: true, message: "请输入", trigger: "change" }
+                    ],
+                    expirationTime: [
+                        { required: true, message: "请输入", trigger: "blur" }
+                    ],
+                    type: [
+                        { required: true, message: "请输入", trigger: "change" }
+                    ],
                 }
             }
         },
@@ -100,74 +120,75 @@
                 default: false,
             },
         },
+        watch: {
+            "form.type"(val) {
+                if (val === "work") {
+                    this.seletctDialogVisible = true
+                }
+            }
+        },
         methods: {
+            selectWork(id) {
+                this.workId = id
+                console.log("我拿到了", id)
+            },
             handleTransportFileList(fileList) {
                 if (fileList.length > 0) {
-                    this.form.avatar = fileList[0].response.data
+                    this.form.image = fileList[0].response
                 } else {
-                    this.form.avatar = ''
+                    this.form.image = ''
                 }
             },
             handleRemove() {
-                this.form.avatar = ''
+                this.form.image = ''
             },
-            handleSuccess(res) {
-                this.form.avatar = res.path
+            handleSuccess(fileList) {
+                if (fileList.length > 0) {
+                    this.form.image = fileList[0].response
+                } else {
+                    this.form.image = ''
+                }
+            },
+            seletctHandleClose() {
+                this.seletctDialogVisible = false
             },
             handleClose() {
                 this.$emit('on-dialog-close')
+                this.$refs.formValidate.resetFields()
+                this.form.image = ""
             },
-            handleConfirm() {
+            handleConfirm(name) {
+                this.$refs[name].validate((valid) => {
+                    if (!valid) return false
+                    let param = {
+                        slide:{
+                            enabled: true,
+                            title: this.form.title,
+                            image: this.form.image,
+                            position: this.form.position,
+                            location: "banner",
+                            effectiveTime: this.form.effectiveTime,
+                            expirationTime: this.form.expirationTime,
+                            type: this.form.type,
+                            link: `${this.form.type}:${this.workId}`,
+                            content:""
+                        }
+                    }
+                    console.log("param", param)
+                    saveSlide(param, res => {
+                        if (res) {
+                            this.$message.success("新增成功！")
+                            this.handleClose()
+                            this.$emit("onRefreshData")
+                        }
+                    })
+                })
+            },
 
-            },
-            handleEdit(index, row) {
-                console.log(index, row);
-            },
-            handleDelete(index, row) {
-                console.log(index, row);
-            },
-            addLabelHandleClose() {
-                this.addDialogVisible = false
-            }
         }
     }
 </script>
 
 <style lang="less" scoped>
-    .dialog-footer {
-        .theme {
-            margin-left: 30px;
-        }
-    }
 
-    /deep/ .el-dialog {
-        border-radius: 10px;
-
-        .el-dialog__header {
-            font-weight: 600;
-            border-bottom: 1px solid #e4e4e4;
-        }
-
-        .el-form-item {
-            margin-top: 15px;
-        }
-
-        .el-form-item:first-child {
-            margin-top: 0px;
-        }
-
-        .el-dialog__footer {
-            margin-top: 40px;
-        }
-    }
-
-    /deep/ .el-select > .el-input {
-        width: 90%;
-    }
-
-    /deep/ .el-textarea .el-input__count {
-        position: absolute;
-        bottom: -40px;
-        right: 0px;
-    }
 </style>
