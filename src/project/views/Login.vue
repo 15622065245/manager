@@ -42,10 +42,10 @@
 </template>
 
 <script>
-import { login, } from "../service/account";
-import {findMyModuleUrl, getWithMe} from "../service/module";
+import { login, findWithMe } from "../service/account";
+import {findMyModule} from "../service/module";
 import {mapActions} from "vuex"
-import {authenticateByUsernameAndPassword, findWithMe} from "../service/employee";
+// import {authenticateByUsernameAndPassword, findWithMe} from "../service/employee";
 import {findWithMe as moduleFindWithMe} from '@/project/service/module'
 
 import {post} from '@/framework/http/request'
@@ -87,14 +87,15 @@ export default {
             if(res) {
               sessionStorage.setItem('store_token', res)
             }
-            findMyModuleUrl({},res => {
-              localStorage.setItem("menuList", JSON.stringify(res))
-              this.$router.push("/account/list")
-            })
-            getWithMe({}, res =>{
+            findWithMe({}, res =>{
               console.log("个人信息", res)
               sessionStorage.setItem('console_cache', JSON.stringify(res))
             })
+            findMyModule({},res => {
+              localStorage.setItem("menuList", JSON.stringify(res))
+              this.$router.push("/account/list")
+            })
+
           })
           // authenticateByUsernameAndPassword(param, res => {
           //   sessionStorage.setItem('console_token', res)
