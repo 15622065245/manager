@@ -12,7 +12,6 @@ let enableUrl = `api/${model}/enable`
 let updateRoleUrl = `api/${model}/updateRole`
 let getWithMeUrl = `api/${model}/getWithMe`
 let updateWithMeUrl = `api/${model}/updateWithMe`
-
 export function findByTable(param, callback) {
     axios.post(findByTableUrl, param).then(data => {
         if (data !== undefined && data !== '' && data !== null) {

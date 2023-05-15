@@ -6,6 +6,8 @@ let countUrl = `api/${model}/count`
 let saveRoleUrl = `api/${model}/save`
 let updateRoleUrl = `api/${model}/update`
 let deleteRoleUrl = `api/${model}/delete`
+let updateModuleUrl = `api/${model}/updateModule`
+
 export function getRoleList(param, callback) {
     axios.post(getRoleListUrl, param).then(data => {
         if (data !== undefined && data !== '' && data !== null) {
@@ -36,6 +38,13 @@ export function updateRole(param, callback) {
 }
 export function deleteRole(param, callback) {
     axios.post(deleteRoleUrl, param).then(data => {
+        if (data !== undefined && data !== '' && data !== null) {
+            callback(data)
+        }
+    })
+}
+export function updateModule(param, callback) {
+    axios.post(updateModuleUrl, param).then(data => {
         if (data !== undefined && data !== '' && data !== null) {
             callback(data)
         }
