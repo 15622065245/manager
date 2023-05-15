@@ -111,6 +111,7 @@
     import RoleSetting from "./role-setting";
     import Search from '@/framework/components/search'
     import { findByTable, count, deleteAccount, enableAccount } from "../../service/account";
+    import { getRoleList} from "../../service/role";
 
 
     export default {
@@ -122,6 +123,36 @@
             Search
         },
         data() {
+            // 搜索下拉框callback函数
+
+            const cb = _Func => {
+                return new Promise((resolve, reject) => {
+                    _Func({role:{
+                            accountType:"Manager",
+                            enabled:true
+                        },
+                        pageable:{
+                            moduleList: [
+                                {id: 1},
+                                {id: 2},
+                                {id: 3},
+                                {id: 4}
+                            ],
+                            page: 1,
+                            size: 20,
+                            sort:"id",
+                            desc:true
+                        }}, res => {
+                        let value = [],
+                            displayValue = []
+                        res.forEach(item => {
+                            displayValue.push(item.name)
+                            value.push(item.id.toString())
+                        })
+                        resolve({displayValue, value})
+                    })
+                })
+            }
             return {
                 tableData: [],
                 searchItems: [{
@@ -131,10 +162,9 @@
                 },
                 {
                     name: '角色',
-                    key: 'type',
+                    key: 'id',
                     type: 'select',
-                    displayValue: ['人事', '运营', '财务', '客服主管'],
-                    value: ['人事', '运营', '财务', '客服主管']
+                    callback: () => cb(getRoleList)
                 },
                 {
                     name: '状态',
@@ -194,8 +224,8 @@
                 if (this.searchData.enabled !== undefined && this.searchData.enabled !== '' && this.searchData.enabled !== -1) {
                     param.manager.enabled = this.searchData.enabled
                 }
-                if (this.searchData.role) {
-                    param.role.id = this.searchData.role
+                if (this.searchData.id) {
+                    param.role.id = this.searchData.id
                 }
                 if (this.searchData.creationTime) {
                     param.creationTime = {
