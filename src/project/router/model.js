@@ -20,7 +20,7 @@ const model = {
             },
             component: () => import("@/project/views/model/list"),
         },{
-            path: "/model/show",
+            path: "/model/show/:id",
             name: "modelShow",
             meta: {
                 isShowHeader: true,
@@ -37,7 +37,7 @@ const model = {
                     },
                     {
                         name: "模特作品详情",
-                        path: "/model/show",
+                        path: "/model/show/:id",
                     },
                 ],
             },
