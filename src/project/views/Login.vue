@@ -87,12 +87,14 @@ export default {
             if(res) {
               sessionStorage.setItem('store_token', res)
             }
+            findMyModule({},res => {
+              localStorage.setItem("menuList", JSON.stringify(res))
+
+            })
             findWithMe({}, res =>{
               console.log("个人信息", res)
               sessionStorage.setItem('console_cache', JSON.stringify(res))
-            })
-            findMyModule({},res => {
-              localStorage.setItem("menuList", JSON.stringify(res))
+              this.$store.dispatch("getUser", res)
               this.$router.push("/account/list")
             })
 
