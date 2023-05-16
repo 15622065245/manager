@@ -20,6 +20,7 @@
                     :fit="'fill'"
                     :src="`${$store.state.prefix}${store.user.avatar}`"
                     class="head-setting-right-avatar"
+                    v-if="store.user.avatar"
             ></el-avatar>
             <span style="margin-left: 15px">{{store.user.realname}}</span>
 <!--            <i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>-->
