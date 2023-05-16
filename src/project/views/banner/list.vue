@@ -1,7 +1,8 @@
 <template>
         <el-row class="searchContent">
             <el-col :span="24" style="margin: 30px 0 20px 0">
-                <search :search-items="searchItems" @on-search="searchBySearchItem"></search>            </el-col>
+                <search :search-items="searchItems" @on-search="searchBySearchItem"></search>
+            </el-col>
             <el-col :span="24">
                 <el-button class="btn addButton" size="small" @click="addHandle">新建</el-button>
 
@@ -53,7 +54,10 @@
                             label="状态">
                         <template slot-scope="scope">
                             <el-switch
-                                    v-model="scope.row.enabled">
+                                    :value="scope.row.enabled"
+                                    active-text="启用"
+                                    inactive-text="禁用"
+                                    @change="enabledChange(scope.row)">
                             </el-switch>
                         </template>
                     </el-table-column>
@@ -62,7 +66,7 @@
                             align="center"
                             label="操作">
                         <template slot-scope="scope">
-                            <el-button size="small" class="optionButton" @click="editHandle">编辑</el-button>
+                            <el-button size="small" class="optionButton" @click="editHandle(scope.row.id)">编辑</el-button>
                             <el-button size="small" class="optionButton" @click="deleteHandle(scope.row.id)">删除</el-button>
                         </template>
                     </el-table-column>
@@ -81,11 +85,15 @@
                     </el-pagination>
                 </div>
             </el-col>
+            <el-col :span="24">
+
+            </el-col>
             <Icreate :dialog-visible="createVisible" @on-dialog-close="handleClose" @onRefreshData="find"></Icreate>
-            <Iedit :dialog-visible="editVisible" @on-dialog-close="handleClose" @onRefreshData="find"></Iedit>
+            <Iedit :dialog-visible="editVisible" :editId="editId" @on-dialog-close="handleClose" @onRefreshData="find"></Iedit>
             <el-dialog
                     title="删除"
                     :visible.sync="deleteVisible"
+                    :modal-append-to-body="false"
                     width="30%">
                 <div style="display: flex;align-items: center">
                     <span style="margin-left: 20px">删除后不可恢复，是否确定删除?</span>
@@ -103,7 +111,7 @@
     import Icreate from "./create";
     import Iedit from "./edit";
     import Search from '@/framework/components/search'
-    import {findByTable, count, deleteSlide} from "../../service/advertising";
+    import {findByTable, count, deleteSlide,enableSlide} from "../../service/advertising";
 
     export default {
         name: "sensitive-title",
@@ -142,7 +150,8 @@
                 deleteVisible: false,
                 roleVisible: false,
                 searchData: [],
-                deleteId: ""
+                deleteId: "",
+                editId: ""
 
             }
         },
@@ -192,19 +201,40 @@
                     this.total = res
                 })
             },
-            handleSizeChange() {
-
+            enabledChange(row) {
+                let params = {
+                    id: row.id,
+                    enabled: !row.enabled
+                }
+                this.$confirm(`确定${!row.enabled ? '启用' : '禁用'}吗?`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(() => {
+                    enableSlide(params, res => {
+                        this.$message.success(`${!row.enabled ? '启用' : '禁用'}成功！`)
+                        this.find()
+                    })
+                }).catch(() => {
+                })
             },
-            handleCurrentChange() {
-
+            handleSizeChange(pageSize) {
+                this.pageSize = pageSize
+                this.find()
+            },
+            handleCurrentChange(page) {
+                this.page = page
+                this.find()
             },
             addHandle() {
                 this.createVisible = true
 
             },
-            editHandle() {
+            editHandle(id) {
+                console.log(id)
+                this.editId = id
                 this.editVisible = true
-
             },
             deleteHandle(id) {
                 this.deleteId = id

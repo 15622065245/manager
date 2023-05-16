@@ -8,18 +8,18 @@
             v-dialogDrag
             :close-on-click-modal="false"
     >
-        <el-row>
-            <el-col :span="24">
+        <el-row class="searchContent">
+            <el-col :span="22" class="search-wrapper">
                 <search :search-items="searchItems" @on-search="searchBySearchItem"></search>
             </el-col>
-            <el-col :span="24" style="margin: 25px 0">
+            <el-col :span="24">
                 <el-table
                         stripe
                         :data="tableData"
                         :header-cell-style="{background:'#f2f2f2'}"
                         style="width: 100%">
                     <el-table-column width="55">
-                        <template slot-scope="scope"><el-radio v-model="workId" :label="scope.row.id" @change="handleSelectionChange(scope.row)">{{""}}</el-radio></template>
+                        <template slot-scope="scope"><el-radio v-model="userId" :label="scope.row.id" @change="handleSelectionChange(scope.row)">{{""}}</el-radio></template>
                     </el-table-column>
                     <el-table-column
                             prop="id"
@@ -27,50 +27,39 @@
                             align="center">
                     </el-table-column>
                     <el-table-column
-                            prop="title"
-                            label="作品标题"
+                            prop="phone"
+                            label="手机号"
                             align="center">
                     </el-table-column>
                     <el-table-column
-                            prop="user.name"
+                            prop="nickname"
                             align="center"
-                            label="所属用户">
+                            label="用户昵称">
                     </el-table-column>
                     <el-table-column
-                            prop="user.homepageName"
+                            prop="identity"
+                            align="center"
+                            label="身份">
+                    </el-table-column>
+                    <el-table-column
+                            prop="datetime"
                             align="center"
                             label="主页名称">
                     </el-table-column>
                     <el-table-column
-                            prop="styleList.name"
+                            prop="creationTime"
                             align="center"
-                            label="风格">
+                            label="注册时间">
                     </el-table-column>
                     <el-table-column
-                            prop="garmentProductsList.name"
+                            prop="name"
                             align="center"
-                            label="衣品">
-                    </el-table-column>
-                    <el-table-column
-                            prop="price"
-                            align="center"
-                            label="模特价格">
-                    </el-table-column>
-                    <el-table-column
-                            prop="amount"
-                            align="center"
-                            label="全包价格">
-                    </el-table-column>
-                    <el-table-column
-                            prop="time"
-                            align="center"
-                            label="上架/下架时间"
-                            width="200">
+                            label="最近登录时间">
                     </el-table-column>
                 </el-table>
             </el-col>
             <el-col :span="24">
-                <div style="float: left">
+                <div class="pager-group" style="float: left">
                     <el-pagination
                             @size-change="handleSizeChange"
                             @current-change="handleCurrentChange"
@@ -91,47 +80,61 @@
 </template>
 
 <script>
+    import {count, getUserList, batchEnable} from "../../service/user";
     import Search from '@/framework/components/search'
-    import { getList, total, sellWorks } from "../../service/model";
+
     export default {
-        name: "select-works",
-        components:{
-            Search
-        },
+        name: "user",
         props: {
             dialogVisible: {
                 type: Boolean,
-                default: false
+                defalut: false
             }
         },
         data() {
             return {
+                tableData: [],
                 searchItems: [
                     {
-                        name: '作品标题',
-                        key: 'title',
+                        name: '用户昵称',
+                        key: 'nickname',
                         type: 'string'
                     },
                     {
-                        name: '主页名称',
-                        key: 'homepageName',
+                        name: '身份',
+                        key: 'identity',
+                        type: 'select',
+                        displayValue: ['未认证', '摄影师', '模特', '场地'],
+                        value: ['pending', 'photographer', 'model', 'place']
+                    },
+                    {
+                        name: '手机号',
+                        key: 'phone',
                         type: 'string'
                     },
                     {
-                        name: '所属用户',
-                        key: 'username',
-                        type: 'string'
-                    },],
+                        name: '状态',
+                        key: 'enabled',
+                        type: 'select',
+                        displayValue: ['禁用', '启用'],
+                        value: [false, true]
+                    },
+                    {
+                        name: '登录时间',
+                        key: 'loginTime',
+                        type: 'datetimerange',
+                    }],
                 page: 1,
                 pageSize: 10,
-                form: {},
-                deleteVisible: false,
-                tableData: [],
-                searchData: {},
                 total: 0,
                 selectID: [],
-                workId: ""
+                searchData: [],// 搜索
+                userId: ""
+
             }
+        },
+        components: {
+            Search
         },
         mounted() {
             this.find()
@@ -139,16 +142,12 @@
         methods: {
             //选择的数据
             handleSelectionChange(row) {
-                this.workId = row.id
-                console.log("this.workId", this.workId)
-                // this.agent = {
-                //     id: row.id,
-                //     username: row.username
-                // }
+                this.userId = row.id
+                console.log("this.userId", this.userId)
             },
             handleConfirm() {
-                if (this.workId) {
-                    this.$emit("selectWork", this.workId)
+                if (this.userId) {
+                    this.$emit("selectUser", this.userId)
                     this.handleClose()
                 }
             },
@@ -157,7 +156,6 @@
             },
             // 搜索
             searchBySearchItem(val) {
-                console.log("val", val)
                 this.searchData = val
                 this.page = 1
                 this.find()
@@ -165,56 +163,41 @@
             //获取数据
             find() {
                 let param = {
-                    works:{
-                        type: "model",
-                        status: "passed"
-                    },
-                    style:{},
-                    garmentProducts:{},
-                    user:{},
-                    creationTime:{},
-                    sellTime:{},
-                    pageable:{
+                    user: {},
+                    loginTime: {},
+                    pageable: {
                         page: this.page,
                         size: this.pageSize,
                         sort: "id",
                         desc: true
                     }
                 }
-                if (this.searchData.title) {
-                    param.works.title = this.searchData.title
+                if (this.searchData.nickname) {
+                    param.user.nickname = this.searchData.nickname
                 }
-                if (this.searchData.sellable !== undefined && this.searchData.sellable !== '' && this.searchData.sellable !== -1) {
-                    param.works.sellable = this.searchData.sellable
+                if (this.searchData.identity) {
+                    param.user.identity = this.searchData.identity
                 }
-                if (this.searchData.type) {
-                    param.works.type = this.garmentProducts.type
+                if (this.searchData.enabled !== undefined && this.searchData.enabled !== '' && this.searchData.enabled !== -1) {
+                    param.user.enabled = this.searchData.enabled
                 }
-                if (this.searchData.styleName) {
-                    param.style.name = this.searchData.styleName
+                if (this.searchData.phone) {
+                    param.user.phone = this.searchData.phone
                 }
-                if (this.searchData.name) {
-                    param.garmentProducts.name = this.searchData.name
-                }
-
-                if (this.searchData.homepageName) {
-                    param.user.homepageName = this.searchData.homepageName
-                }
-                if (this.searchData.sellTime) {
-                    param.sellTime = {
-                        start: this.searchData.sellTime[0],
-                        end: this.searchData.sellTime[1]
+                if (this.searchData.loginTime) {
+                    param.loginTime = {
+                        start: this.searchData.loginTime[0],
+                        end: this.searchData.loginTime[1]
                     }
                 }
-                console.log(param)
-                getList(param, res => {
+                getUserList(param, res => {
                     res.forEach(item => {
                         item.id = item.id.toString()
                     })
                     this.tableData = res
                     console.log("table", this.tableData)
                 })
-                total(param, res => {
+                count(param, res => {
                     this.total = res
                 })
             },
@@ -230,6 +213,7 @@
         }
     }
 </script>
+
 
 <style lang="less" scoped>
 

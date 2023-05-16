@@ -49,9 +49,16 @@
                             <el-input v-model="form.position" placeholder="请输入" style="width: 95%"></el-input>
                         </el-form-item>
                         <el-form-item label="跳转类型" prop="type">
-                            <el-radio v-model="form.type" label="work">作品详情</el-radio>
-                            <el-radio v-model="form.type" label="content">图文详情</el-radio>
-                            <el-radio v-model="form.type" label="user">用户主页</el-radio>
+                            <el-col>
+                                <el-radio @click.native="workClick" v-model="form.type" label="work">作品详情</el-radio>
+                                <el-radio @click.native="imageTextClick" v-model="form.type" label="content">图文详情</el-radio>
+                                <el-radio @click.native="userClick" v-model="form.type" label="user">用户主页</el-radio>
+                            </el-col>
+                            <el-col>
+                                <span v-if="form.type=== 'work'">已选作品id：{{workId}}</span>
+                                <span v-if="form.type=== 'user'">已选用户主页id：{{userId}}</span>
+                            </el-col>
+
                         </el-form-item>
                     </el-form>
 
@@ -60,20 +67,26 @@
                 <el-button size="small" @click="handleClose">取消</el-button>
             </div>
         </el-dialog>
-        <selectWorks :dialogVisible="seletctDialogVisible" @on-dialog-close="seletctHandleClose" @selectWork="selectWork"></selectWorks>
+        <select-works :dialogVisible="seletctDialogVisible" @on-dialog-close="seletctHandleClose" @selectWork="selectWork"></select-works>
+        <select-user :dialogVisible="userDialogVisible" @on-dialog-close="seletctHandleClose" @selectUser="selectUser"> </select-user>
+        <image-text :dialogVisible="imageTextDialogVisible" @on-dialog-close="seletctHandleClose" @selectImageText="selectImageText"></image-text>
     </div>
 </template>
 
 <script>
     import Upload from '@/framework/components/upload'
     import selectWorks from "./select-works"
+    import selectUser from  "./select-user"
     import { saveSlide } from "../../service/advertising";
+    import ImageText from "./image-text";
 
     export default {
         name: "create",
         components: {
+            ImageText,
             Upload,
-            selectWorks
+            selectWorks,
+            selectUser
         },
         data() {
             const avatarValidate = (rule, value, callback) => {
@@ -88,7 +101,10 @@
                     location: "banner"
                 },
                 seletctDialogVisible: false,
+                userDialogVisible: false,
+                imageTextDialogVisible: false,
                 workId: "",
+                userId: "",
                 rules: {
                     location: [
                         { required: true, message: "请输入", trigger: "blur" }
@@ -111,7 +127,8 @@
                     type: [
                         { required: true, message: "请输入", trigger: "change" }
                     ],
-                }
+                },
+                contentObj:{}
             }
         },
         props: {
@@ -128,9 +145,26 @@
             }
         },
         methods: {
+            workClick() {
+                this.seletctDialogVisible = true
+            },
+            userClick() {
+                this.userDialogVisible = true
+            },
+            imageTextClick() {
+                this.imageTextDialogVisible = true
+            },
             selectWork(id) {
                 this.workId = id
-                console.log("我拿到了", id)
+                console.log("我拿到了workId", id)
+            },
+            selectUser(id) {
+                this.userId = id
+                console.log("我拿到了userId", id)
+            },
+            selectImageText(obj) {
+                this.contentObj = obj
+                console.log("我拿到了contentObj", obj)
             },
             handleTransportFileList(fileList) {
                 if (fileList.length > 0) {
@@ -151,6 +185,8 @@
             },
             seletctHandleClose() {
                 this.seletctDialogVisible = false
+                this.userDialogVisible = false
+                this.imageTextDialogVisible = false
             },
             handleClose() {
                 this.$emit('on-dialog-close')
@@ -170,9 +206,13 @@
                             effectiveTime: this.form.effectiveTime,
                             expirationTime: this.form.expirationTime,
                             type: this.form.type,
-                            link: `${this.form.type}:${this.workId}`,
-                            content:""
+                            link: `${this.form.type}:${this.form.type=== 'work'? this.workId : this.userId}`,
+                            topic: `${this.contentObj.topic ? this.contentObj.topic: ''}`,
+                            content: `${this.contentObj.content ? this.contentObj.content: ''}`
                         }
+                    }
+                    if (this.form.type === 'content') {
+                        param.slide.link = ''
                     }
                     console.log("param", param)
                     saveSlide(param, res => {
