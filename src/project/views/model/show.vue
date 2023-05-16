@@ -7,22 +7,26 @@
             <div style="display: flex;justify-content: space-around;margin-top: 30px">
                 <div style="margin-left: 80px">
                     <el-descriptions :column="2">
-                        <el-descriptions-item label="作品标题">实拍韩风2023新款韩版吊带内穿</el-descriptions-item>
-                        <el-descriptions-item label="ID">001</el-descriptions-item>
-                        <el-descriptions-item label="模特价格">99</el-descriptions-item>
-                        <el-descriptions-item label="所属用户">小徐小徐是条咸鱼</el-descriptions-item>
-                        <el-descriptions-item label="全包价格">{{'199'}}</el-descriptions-item>
-                        <el-descriptions-item label="主页名称">{{'我是模特'}}</el-descriptions-item>
-                        <el-descriptions-item label="衣品">{{'小清新'}}</el-descriptions-item>
+                        <el-descriptions-item label="作品标题">{{info.title}}</el-descriptions-item>
+                        <el-descriptions-item label="ID">{{info.id}}</el-descriptions-item>
+                        <el-descriptions-item label="模特价格">{{info.price}}</el-descriptions-item>
+                        <el-descriptions-item label="所属用户"><span v-if="info.user">{{info.user.nickname}}</span></el-descriptions-item>
+                        <el-descriptions-item label="全包价格">{{info.amount}}</el-descriptions-item>
+                        <el-descriptions-item label="主页名称"><span v-if="info.user">{{info.user.homepageName}}</span></el-descriptions-item>
+                        <el-descriptions-item label="衣品">
+                            <span v-for="item in info.garmentProductsList">{{item.name}}、</span>
+                        </el-descriptions-item>
                         <el-descriptions-item label="启用状态">
                             <el-switch
-                                    v-model="value"
+                                    v-model="info.enabled"
                                     active-color="#13ce66"
                                     inactive-color="#ff4949">
                             </el-switch>
                         </el-descriptions-item>
-                        <el-descriptions-item label="风格">{{'御姐'}}</el-descriptions-item>
-                        <el-descriptions-item label="上/下架时间">{{'2022-1-18 15:00'}}</el-descriptions-item>
+                        <el-descriptions-item label="风格">
+                            <span v-for="item in info.styleList">{{item.name}}、</span>
+                        </el-descriptions-item>
+                        <el-descriptions-item label="上/下架时间">{{info.sellTime}}</el-descriptions-item>
                     </el-descriptions>
                 </div>
             </div>
@@ -33,9 +37,9 @@
             </div>
             <div style="padding-left: 30px">
                 <div class="work-info">
-                    <el-image v-for="(item,index) in imageList" :key="index"
+                    <el-image v-for="(item,index) in info.worksImages" :key="index"
                               style="width: 184px;height: 184px;margin: 0 5px 0 20px"
-                              :src="item.url"
+                              :src="`${$store.state.prefix}${item}`"
                               fit="fill"></el-image>
                 </div>
             </div>
@@ -48,13 +52,14 @@
                 <div style="display: flex">
                     <div style="margin-right: 15px; width: 70px">视频封面</div>
                     <el-image
+                            v-if="info.videoCover"
                             style="width: 184px;height: 184px"
-                            :src="url"
+                            :src="`${$store.state.prefix}${info.videoCover}`"
                             fit="fill"></el-image>
                 </div>
                 <div style="display: flex;margin-top: 20px">
                     <div style="margin-right: 15px;width: 70px;">视频</div>
-                    <video controls src="https://cdn.modao.cc/Default_video.mp4"
+                    <video controls :src="`${$store.state.prefix}${info.video}`"
                            style="width: 320px;height: 180px"></video>
                 </div>
             </div>
@@ -65,7 +70,7 @@
             </div>
             <div style="display: flex;flex-direction:column;justify-content: center;align-items: center">
                 <div class="scroll-view">
-                    <img v-for="image in imageList" :src="image.url"/>
+                    <img v-for="image in info.contentImages" :src="`${$store.state.prefix}${image}`"/>
                 </div>
                 <el-button size="small" style="margin-top: 10px;background-color: #ff1919;border: none">删除</el-button>
             </div>
@@ -76,6 +81,8 @@
 </template>
 
 <script>
+    import { get } from "../../service/model";
+
     export default {
         name: "create",
         data() {
@@ -92,10 +99,26 @@
                     url: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
                 }, {
                     url: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
-                }]
+                }],
+                info:{}
             }
         },
-        methods: {}
+        created() {
+            this.find()
+        },
+        methods: {
+            find() {
+                get({id: this.$route.params.id}, res => {
+                    this.info = res
+                    if (this.info.worksImages) {
+                        this.info.worksImages = this.info.worksImages.split(',')
+                    }
+                    if (this.info.worksImages) {
+                        this.info.contentImages = this.info.contentImages.split(',')
+                    }
+                })
+            }
+        }
     }
 </script>
 
