@@ -20,7 +20,7 @@ const feedback = {
             },
             component: () => import("@/project/views/feedback/list"),
         },{
-            path: "/feedback/show",
+            path: "/feedback/show/:id",
             name: "feedbackShow",
             meta: {
                 isShowHeader: true,
@@ -37,7 +37,7 @@ const feedback = {
                     },
                     {
                         name: "意见反馈详情",
-                        path: "/feedback/show",
+                        path: "/feedback/show/:id",
                     },
                 ],
             },

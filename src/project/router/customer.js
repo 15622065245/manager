@@ -20,7 +20,7 @@ const customer = {
             },
             component: () => import("@/project/views/customer/list"),
         },{
-            path: "/customer/show",
+            path: "/customer/show/:id",
             name: "customerShow",
             meta: {
                 isShowHeader: true,
@@ -37,7 +37,7 @@ const customer = {
                     },
                     {
                         name: "客服留言详情",
-                        path: "/customer/show",
+                        path: "/customer/show/:id",
                     },
                 ],
             },
