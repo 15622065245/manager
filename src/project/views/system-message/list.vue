@@ -2,25 +2,11 @@
     <div class="account">
         <el-row class="searchContent">
             <el-col :span="24" style="margin: 30px 0 20px 0">
-                <span class="labelText" style="margin-right: 10px">消息标题</span>
-                <el-input v-model="input" placeholder="请输入" style="margin-right: 20px"></el-input>
-                <span class="labelText" style="margin-right: 10px">推送时间</span>
-                <el-date-picker
-                        v-model="value1"
-                        type="daterange"
-                        range-separator="至"
-                        start-placeholder="开始日期"
-                        end-placeholder="结束日期">
-                </el-date-picker>
-                <el-button class="find btn" size="small">查询</el-button>
+                <search :search-items="searchItems" @on-search="searchBySearchItem"></search>
             </el-col>
-        </el-row>
-        <el-row>
             <el-col :span="24">
-                <el-button class="btn addButton" size="small" @click="showHandle">新建</el-button>
+                <el-button class="btn addButton" size="small" @click="createHandle">新建</el-button>
             </el-col>
-        </el-row>
-        <el-row style="margin: 10px 40px 0 0">
             <el-col :span="24">
                 <el-table
                         stripe
@@ -28,22 +14,22 @@
                         :header-cell-style="{background:'#f2f2f2'}"
                         style="width: 100%">
                     <el-table-column
-                            prop="code"
+                            prop="id"
                             label="消息ID"
                             align="center">
                     </el-table-column>
                     <el-table-column
-                            prop="code"
+                            prop="title"
                             label="消息标题"
                             align="center">
                     </el-table-column>
                     <el-table-column
-                            prop="title"
+                            prop="userList"
                             label="推送对象"
                             align="center">
                     </el-table-column>
                     <el-table-column
-                            prop="datetime"
+                            prop="creationTime"
                             align="center"
                             label="推送时间">
                     </el-table-column>
@@ -52,14 +38,12 @@
                             align="center"
                             label="操作">
                         <template slot-scope="scope">
-                            <el-button size="small" class="optionButton" @click="showHandle">查看</el-button>
-                            <el-button size="small" class="optionButton" @click="deleteHandle">删除</el-button>
+                            <el-button size="small" class="optionButton" @click="showHandle(scope.row.userList)">查看</el-button>
+                            <el-button size="small" class="optionButton" @click="deleteHandle(scope.row.id)">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
             </el-col>
-        </el-row>
-        <el-row class="page">
             <el-col :span="24">
                 <div class="pager-group" style="float: left">
                     <el-pagination
@@ -69,77 +53,104 @@
                             :page-sizes="[10, 20, 50, 100]"
                             :page-size="10"
                             layout="total, sizes, prev, pager, next, jumper"
-                            :total="800">
+                            :total="total">
                     </el-pagination>
                 </div>
             </el-col>
-        </el-row>
-        <!-- 删除弹框-->
-        <el-dialog
-                title="删除"
-                :visible.sync="deleteVisible"
-                width="30%">
-            <div style="display: flex;align-items: center">
-                <span style="margin-left: 20px">删除后不可恢复，是否确定删除?</span>
-            </div>
-            <span slot="footer" class="dialog-footer">
+            <!-- 删除弹框-->
+            <el-dialog
+                    title="删除"
+                    :visible.sync="deleteVisible"
+                    :modal-append-to-body="false"
+                    width="30%">
+                <div style="display: flex;align-items: center">
+                    <span style="margin-left: 20px">删除后不可恢复，是否确定删除?</span>
+                </div>
+                <span slot="footer" class="dialog-footer">
             <el-button size="small" @click="deleteVisible = false">取 消</el-button>
             <el-button size="small" type="primary" @click="deleteVisible = false">确 定</el-button>
           </span>
-        </el-dialog>
+            </el-dialog>
+        </el-row>
 
     </div>
 </template>
 
 <script>
+    import Search from '@/framework/components/search'
+    import {findByTable, count, deleteMessage} from "../../service/system-message";
+
     export default {
         name: "sensitive-title",
+        components: {
+            Search
+        },
         data() {
-            const item = {
-                code: "001",
-                datetime: '2016-05-02 12:00:00',
-                title: '王小虎',
-                name: '交易板块'
-            }
+
             return {
-                tableData: new Array(5).fill(item),
-                searchItems: [{
-                    // name: '名称',
-                    key: 'name',
-                    type: 'string'
-                },],
+                tableData: [],
+                searchItems: [
+                    {
+                        name: '消息标题',
+                        key: 'title',
+                        type: 'string'
+                    },
+                    {
+                        name: '推送时间',
+                        key: 'creationTime',
+                        type: 'datetimerange',
+                    }],
                 input: "",
-                page: 10,
+                page: 1,
+                pageSize: 10,
+                total: 0,
                 createVisible: false,
                 editVisible: false,
                 deleteVisible: false,
                 roleVisible: false,
-                // 扫描标记
-                form: {
-                    name: "",
-                    level:"",
-                    encryption:"",
-                    desensitization:"",
-                    desc: "",
-                    testCode:""
-                },
-                bulkEncryptionDialogVisible:false,
-                options: [{
-                    value: '全部',
-                    label: '全部'
-                }, {
-                    value: '启用',
-                    label: '启用'
-                }, {
-                    value: '禁用',
-                    label: '禁用'
-                }],
-                value: '',
-                value1: ''
-
+                searchData: []
             }
         },
+        mounted() {
+            this.find()
+        },
         methods: {
+            searchBySearchItem(val) {
+                console.log("val", val)
+                this.searchData = val
+                this.page = 1
+                this.find()
+            },
+            find() {
+                let param = {
+                    notificationPacket:{},
+                    creationTime:{},
+                    pageable:{
+                        page: this.page,
+                        size: this.pageSize,
+                        sort: "id",
+                        desc: true
+                    }
+                }
+                if (this.searchData.title) {
+                    param.notificationPacket.title = this.searchData.title
+                }
+                if (this.searchData.creationTime) {
+                    param.creationTime = {
+                        start: this.searchData.creationTime[0],
+                        end: this.searchData.creationTime[1]
+                    }
+                }
+                findByTable(param, res => {
+                    res.forEach(item => {
+                        item.id = item.id.toString()
+                    })
+                    this.tableData = res
+                })
+                count(param, res => {
+                    this.total = res
+                })
+            },
             handleSizeChange() {
 
             },
@@ -154,19 +165,35 @@
                 this.editVisible = true
 
             },
-            deleteHandle() {
-                this.deleteVisible = true
+            deleteHandle(id) {
+                this.$confirm(`确定要删除吗?`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(() => {
+                    deleteMessage({id: id}, res => {
+                        if (res === 204) {
+                            this.$message.success(`删除成功！`)
+                            this.find()
+                        }
+                    })
+                }).catch(() => {
+                })
             },
             roleHandle() {
               this.roleVisible = true
             },
-            showHandle() {
-                this.$router.push({name: 'systemMessageShow'})
+            createHandle() {
+                this.$router.push({name: 'systemMessageCreate'})
+            },
+            showHandle(data) {
+                console.log("data", data)
+                this.$router.push({name: 'systemMessageShow', params: {userList: data}})
             },
             handleClose() {
                 this.createVisible = false
                 this.editVisible = false
-                this.bulkEncryptionDialogVisible = false
                 this.roleVisible = false
             },
             handleConfirm() {

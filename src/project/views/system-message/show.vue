@@ -26,7 +26,7 @@
             <div style="margin: 5px 0 0 50px;">
                 <div>
                     <span class="labelText" style="margin-right: 10px">手机号</span>
-                    <el-input v-model="input" placeholder="请输入" style="margin-right: 20px"></el-input>
+                    <el-input placeholder="请输入" style="margin-right: 20px"></el-input>
                     <el-button class="find btn" size="small">查询</el-button>
                 </div>
                 <div style="margin-top: 30px">
@@ -41,17 +41,12 @@
                             style="width: 70%">
                         <el-table-column
                                 prop="code"
-                                label="消息ID"
+                                label="昵称"
                                 align="center">
                         </el-table-column>
                         <el-table-column
                                 prop="code"
-                                label="消息标题"
-                                align="center">
-                        </el-table-column>
-                        <el-table-column
-                                prop="title"
-                                label="推送对象"
+                                label="手机号"
                                 align="center">
                         </el-table-column>
                         <el-table-column
@@ -80,6 +75,7 @@
 <script>
     export default {
         name: "show",
+        props: ['userList'],
         data() {
             const item = {
                 code: "001",
@@ -91,6 +87,9 @@
                 tableData: new Array(3).fill(item),
                 value: "",
             }
+        },
+        mounted() {
+            console.log("userList", this.userList)
         },
         methods: {
             goBack() {
