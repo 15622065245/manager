@@ -8,28 +8,31 @@
                 <div style="margin-left: 50px">
                     <el-form label-width="80px" style="color: #101010">
                         <el-form-item label="用户ID:">
-                            <span>001</span>
+                            <span>{{info.user.id}}</span>
                         </el-form-item>
                         <el-form-item label="昵称:">
-                            <span>张飞</span>
+                            <span>{{info.user.nickname}}</span>
                         </el-form-item>
                         <el-form-item label="手机号:">
-                            <span>18307681234</span>
+                            <span>{{info.contractPhone}}</span>
                         </el-form-item>
                         <el-form-item label="状态:">
-                            <span>已处理</span>
+                            <span>{{info.status}}</span>
                         </el-form-item>
                         <el-form-item label="留言时间:">
-                            <span>2022-01-18 15:00</span>
+                            <span>{{info.creationTime}}</span>
                         </el-form-item>
                         <el-form-item label="留言内容:">
-                            <span>您好，能咨询下商务合作吗? 有个bug我觉得你们需要修复....</span>
+                            <span>{{info.content}}</span>
                         </el-form-item>
                         <el-form-item label="留言图片:">
                             <el-image
-                                    style="width: 200px; height: 100px"
-                                    :src="url"
-                                    fit="fill"></el-image>
+                                    v-if="info.image"
+                                    style="width: 200px"
+                                    :src="`${$store.state.prefix}${info.image}`"
+                                    fit="fill"
+                                    :preview-src-list="[`${$store.state.prefix}${info.image}`]">
+                            </el-image>
                         </el-form-item>
                     </el-form>
                     <div>
@@ -46,14 +49,23 @@
 </template>
 
 <script>
+    import { getMessage } from "../../service/customer-message";
+
     export default {
-        name: "create",
+        name: "show",
         data() {
             return {
                 value: "",
                 url: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
+                info: {}
 
             }
+        },
+        mounted() {
+            getMessage({id: this.$route.params.id}, res => {
+                this.info = res
+                console.log("res", res)
+            })
         },
         methods: {
             goBack() {
