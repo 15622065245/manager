@@ -92,6 +92,7 @@
             <el-dialog
                     title="删除"
                     :visible.sync="deleteVisible"
+                    :modal-append-to-body="false"
                     width="30%">
                 <div style="display: flex;align-items: center">
                     <span style="margin-left: 20px">删除后不可恢复，是否确定删除?</span>

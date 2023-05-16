@@ -299,7 +299,7 @@
             },
             handleShow(id) {
                 console.log(id)
-                this.$router.push({name: 'modelShow'})
+                this.$router.push({name: 'modelShow', params:{ id: id}})
             },
         }
     }
