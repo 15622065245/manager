@@ -29,7 +29,7 @@ export function pass(param, callback) {
         }
     })
 }
-export function delelte(param, callback) {
+export function delelteWorks(param, callback) {
     axios.post(deleteUrl, param).then(data => {
         if (data !== undefined && data !== '' && data !== null) {
             callback(data)

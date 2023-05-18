@@ -1,14 +1,15 @@
 import axios from '@/framework/http/axios'
-const model = 'user';
+const model = 'garmentProducts';
 
-let getUserListUrl = `api/${model}/find`
+let getListUrl = `api/${model}/search`
 let countUrl = `api/${model}/count`
-let enableUrl = `api/${model}/enable`
+let saveUrl = `api/${model}/save`
+let deleteUrl = `api/${model}/delete`
+let updateUrl = `api/${model}/update`
 let getUrl = `api/${model}/get`
-let updateWithManagerUrl = `api/${model}/updateWithManager`
 
-export function getUserList(param, callback) {
-    axios.post(getUserListUrl, param).then(data => {
+export function getList(param, callback) {
+    axios.post(getListUrl, param).then(data => {
         if (data !== undefined && data !== '' && data !== null) {
             callback(data)
         }
@@ -21,8 +22,22 @@ export function count(param, callback) {
         }
     })
 }
-export function batchEnable(param, callback) {
-    axios.post(enableUrl, param).then(data => {
+export function save(param, callback) {
+    axios.post(saveUrl, param).then(data => {
+        if (data !== undefined && data !== '' && data !== null) {
+            callback(data)
+        }
+    })
+}
+export function deleteClothing(param, callback) {
+    axios.post(deleteUrl, param).then(data => {
+        if (data !== undefined && data !== '' && data !== null) {
+            callback(data)
+        }
+    })
+}
+export function update(param, callback) {
+    axios.post(updateUrl, param).then(data => {
         if (data !== undefined && data !== '' && data !== null) {
             callback(data)
         }
@@ -30,13 +45,6 @@ export function batchEnable(param, callback) {
 }
 export function get(param, callback) {
     axios.post(getUrl, param).then(data => {
-        if (data !== undefined && data !== '' && data !== null) {
-            callback(data)
-        }
-    })
-}
-export function updateHomePage(param, callback) {
-    axios.post(updateWithManagerUrl, param).then(data => {
         if (data !== undefined && data !== '' && data !== null) {
             callback(data)
         }
