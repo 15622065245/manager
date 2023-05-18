@@ -1,11 +1,11 @@
 <template>
-    <el-row class="searchContent">
-        <el-col :span="24" class="search-wrapper">
+    <el-row style="margin-top: 20px">
+        <el-col :span="24">
             <search :search-items="searchItems" @on-search="searchBySearchItem"></search>
         </el-col>
-        <el-col :span="24">
-            <el-button class="btn addButton" size="small" @click="handleBatchDispose">标记已处理</el-button>
-            <el-button class="btn addButton" size="small" @click="deleteHandle">删除</el-button>
+        <el-col :span="24" style="margin: 20px 0">
+            <el-button type="primary" size="small" @click="handleBatchDispose">标记已处理</el-button>
+            <el-button type="primary" size="small" @click="deleteConfirm">删除</el-button>
         </el-col>
         <el-col :span="24">
             <el-table
@@ -70,40 +70,26 @@
                         label="操作"
                         width="280">
                     <template slot-scope="scope">
-                        <el-button size="small" @click="showHandle(scope.row.id)">查看</el-button>
-                        <el-button v-if="!scope.row.processTime" size="small" @click="handledispose(scope.row.id)">标记已处理</el-button>
-                        <el-button size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+                        <el-button type="text" size="small" @click="showHandle(scope.row.id)">查看</el-button>
+                        <el-button type="text" v-if="!scope.row.processTime" size="small" @click="handledispose(scope.row.id)">标记已处理</el-button>
+                        <el-button type="text" style="color: red" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
         </el-col>
-        <el-col :span="24">
+        <el-col :span="24" style="margin-top: 20px">
             <div class="pager-group" style="float: left">
                 <el-pagination
                         @size-change="handleSizeChange"
                         @current-change="handleCurrentChange"
                         :current-page="page"
                         :page-sizes="[10, 20, 50, 100]"
-                        :page-size="10"
+                        :page-size="pageSize"
                         layout="total, sizes, prev, pager, next, jumper"
                         :total="total">
                 </el-pagination>
             </div>
         </el-col>
-        <!-- 删除弹框-->
-        <el-dialog
-                title="删除"
-                :visible.sync="deleteVisible"
-                :modal-append-to-body="false"
-                width="30%">
-            <div style="display: flex;align-items: center">
-                <span style="margin-left: 20px">删除后不可恢复，是否确定删除?</span>
-            </div>
-            <span slot="footer" class="dialog-footer">
-            <el-button size="small" @click="deleteVisible = false">取 消</el-button>
-            <el-button size="small" type="primary" @click="deleteConfirm">确 定</el-button>
-          </span>
-        </el-dialog>
     </el-row>
 </template>
 
@@ -111,7 +97,7 @@
     import Search from "@/framework/components/search/"
     import {count, findByTable, processReport, deleteReport} from "../../service/report";
     export default {
-        name: "customer",
+        name: "list",
         data() {
 
             return {
@@ -127,13 +113,11 @@
                         key: 'creationTime',
                         type: 'datetimerange',
                     }],
-                input: "",
                 page: 1,
                 pageSize: 10,
                 total: 0,
                 createVisible: false,
                 editVisible: false,
-                deleteVisible: false,
                 searchData: [],
                 selectID: []
 
@@ -148,7 +132,6 @@
         methods: {
             // 搜索
             searchBySearchItem(val) {
-                console.log("val", val)
                 this.searchData = val
                 this.page = 1
                 this.find()
@@ -217,16 +200,18 @@
                     arr.push(item.id)
                 })
                 this.selectID = arr
-                console.log("this.selectID", this.selectID)
             },
-            handleSizeChange() {
-
+            handleSizeChange(pageSize) {
+                this.pageSize = pageSize
+                this.find()
             },
-            handleCurrentChange() {
-
+            handleCurrentChange(page) {
+                this.page = page
+                this.find()
             },
             showHandle(id) {
-                this.$router.push({name: "feedbackShow", params:{id: id}})
+                console.log("id", id)
+                this.$router.push({name: "reportShow", params:{id: id}})
             },
             deleteHandle(id) {
                 this.selectID = [id]
@@ -249,6 +234,8 @@
                                 this.find()
                             }
                         })
+                    } else {
+                        this.$message.warning("请勾选至少一条数据")
                     }
                 }).catch(() => {
                 })

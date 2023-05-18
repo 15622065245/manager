@@ -29,8 +29,8 @@
             </el-form>
 
             <div slot="footer" class="dialog-footer">
-                <el-button class="theme" size="small" @click="handleConfirm('formValidate')">提交</el-button>
                 <el-button size="small" @click="handleClose">取消</el-button>
+                <el-button type="primary" size="small" @click="handleConfirm('formValidate')">提交</el-button>
             </div>
         </el-dialog>
     </div>
@@ -63,7 +63,7 @@
                     enabled: [
                         { required: true, message: '请输入状态', trigger: 'blur' },
                     ],
-                }
+                },
             }
         },
         created() {
@@ -77,7 +77,7 @@
                 default: false,
             },
             editData: {
-                type: String,
+                type: Object,
             }
         },
         watch: {
@@ -90,10 +90,12 @@
         methods: {
             getData() {
                 // this.form = this.editData
-              get({id: this.editData}, res => {
-                  this.form = res
-                  console.log("数据", res)
-              })
+                this.form = JSON.parse(JSON.stringify(this.editData))
+              // get({id: this.editData}, res => {
+              //     this.form = res
+              //     this.finshed = true
+              //     console.log("数据", res)
+              // })
             },
             handleClose() {
                 this.$emit('on-dialog-close')

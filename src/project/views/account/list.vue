@@ -1,10 +1,10 @@
 <template>
         <el-row>
-            <el-col :span="24">
+            <el-col :span="24" style="margin-top: 20px">
                 <search :search-items="searchItems" @on-search="searchBySearchItem"></search>
             </el-col>
-            <el-col :span="24">
-                <el-button size="small" @click="addHandle">新建</el-button>
+            <el-col :span="24" style="margin: 20px 0">
+                <el-button type="primary" size="small" @click="addHandle">新建</el-button>
             </el-col>
             <el-col :span="24">
                 <el-table
@@ -35,12 +35,14 @@
                             label="角色">
                         <template slot-scope="scope">
                             <span>
-                                <span v-for="item in scope.row.roleList">{{item.name}};</span>
+                                <span v-for="(item, index) in scope.row.roleList">{{item.name}}
+                                    <span v-if="index !== scope.row.roleList.length -1">;</span>
+                                </span>
                             </span>
                         </template>
                     </el-table-column>
                     <el-table-column
-                            prop="createtime"
+                            prop="creationTime"
                             align="center"
                             label="创建时间">
                     </el-table-column>
@@ -63,21 +65,21 @@
                             label="操作"
                             width="280">
                         <template slot-scope="scope">
-                            <el-button size="small" class="optionButton" @click="editHandle(scope.row.id)">编辑</el-button>
-                            <el-button size="small" class="optionButton" @click="roleHandle(scope.row.id)">角色设置</el-button>
-                            <el-button size="small" class="optionButton" @click="deleteHandle(scope.row.id)">删除</el-button>
+                            <el-button type="text" size="small" class="optionButton" @click="editHandle(scope.row)">编辑</el-button>
+                            <el-button type="text" size="small" class="optionButton" @click="roleHandle(scope.row.id)">角色设置</el-button>
+                            <el-button type="text" style="color: red" size="small" class="optionButton" @click="deleteHandle(scope.row.id)">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
             </el-col>
-            <el-col :span="24">
+            <el-col :span="24" style="margin-top: 20px">
                 <div class="pager-group" style="float: left">
                     <el-pagination
                             @size-change="handleSizeChange"
                             @current-change="handleCurrentChange"
                             :current-page="page"
                             :page-sizes="[10, 20, 50, 100]"
-                            :page-size="10"
+                            :page-size="pageSize"
                             layout="total, sizes, prev, pager, next, jumper"
                             :total="total">
                     </el-pagination>
@@ -88,20 +90,6 @@
             <!-- 修改目录弹框-->
             <Iedit :dialog-visible="editVisible" :editData="rowData" @on-dialog-close="handleClose" @onRefreshData="find"></Iedit>
             <RoleSetting :dialog-visible="roleVisible" :roleId="roleId" @on-dialog-close="handleClose" @onRefreshData="find"></RoleSetting>
-            <!-- 删除弹框-->
-            <el-dialog
-                    title="删除"
-                    :visible.sync="deleteVisible"
-                    :modal-append-to-body="false"
-                    width="30%">
-                <div style="display: flex;align-items: center">
-                    <span style="margin-left: 20px">删除后不可恢复，是否确定删除?</span>
-                </div>
-                <span slot="footer" class="dialog-footer">
-            <el-button size="small" @click="deleteVisible = false">取 消</el-button>
-            <el-button size="small" type="primary" @click="deleteConfirm">确 定</el-button>
-          </span>
-            </el-dialog>
         </el-row>
 
 </template>
@@ -157,7 +145,7 @@
             return {
                 tableData: [],
                 searchItems: [{
-                    name: '名称',
+                    name: '账号',
                     key: 'username',
                     type: 'string'
                 },
@@ -181,14 +169,12 @@
                 }],
                 createVisible: false,
                 editVisible: false,
-                deleteVisible: false,
                 roleVisible: false,
                 total: 0,
                 searchParams: {},
                 page: 1,
                 pageSize: 10,
-                rowData: null,
-                deleteId: 0,
+                rowData: {},
                 searchData: [],// 搜索
                 roleId: 0
             }
@@ -273,22 +259,24 @@
                 }).catch(() => {
                 })
             },
-            editHandle(id) {
-                this.rowData = id
+            editHandle(row) {
+                this.rowData = row
                 this.editVisible = true
             },
             deleteHandle(id) {
-                console.log(id)
-                this.deleteId = id
-                this.deleteVisible = true
-            },
-            deleteConfirm() {
-                deleteAccount({id: this.deleteId}, res => {
-                    if (res === 204) {
-                        this.$message.success("删除成功")
-                        this.deleteVisible = false
-                        this.find()
-                    }
+                this.$confirm(`确定要删除吗?`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(() => {
+                    deleteAccount({id: id}, res => {
+                        if (res === 204) {
+                            this.$message.success(`删除成功！`)
+                            this.find()
+                        }
+                    })
+                }).catch(() => {
                 })
             },
             roleHandle(id) {

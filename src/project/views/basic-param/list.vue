@@ -23,10 +23,11 @@
                 </el-form-item>
                 <el-form-item label="分享海报图">
                     <el-image
+                            v-if="formLabelAlign.SharePoster"
                             style="width: 291px; height: 503px"
                             :src="`${$store.state.prefix}${formLabelAlign.SharePoster}`"
                             fit="fill"></el-image>
-                    <el-button @click="editPicture" size="small" style="float: right">编辑</el-button>
+                    <el-button type="primary" @click="editPicture" size="small" style="float: right">编辑</el-button>
                 </el-form-item>
             </el-form>
         </div>

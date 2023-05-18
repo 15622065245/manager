@@ -20,8 +20,8 @@
             </el-form>
 
             <div slot="footer" class="dialog-footer">
-                <el-button class="theme" size="small" @click="handleConfirm('formValidate')">提交</el-button>
                 <el-button size="small" @click="handleClose">取消</el-button>
+                <el-button type="primary" size="small" @click="handleConfirm('formValidate')">提交</el-button>
             </div>
         </el-dialog>
     </div>
@@ -68,7 +68,7 @@
             },
             handleClose() {
                 this.$emit('on-dialog-close')
-                this.$refs.formValidate.resetFields()
+                // this.$refs.formValidate.resetFields()
             },
             handleConfirm(name) {
                 this.$refs[name].validate((valid) => {

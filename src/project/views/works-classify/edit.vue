@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-dialog
-                title="基本信息"
+                title="编辑风格"
                 :visible.sync="dialogVisible"
                 :modal-append-to-body="false"
                 width="40%"
@@ -10,11 +10,8 @@
                 :close-on-click-modal="false"
         >
             <el-form ref="formValidate" :rules="rules" :model="form" label-width="100px">
-                <el-form-item label="文章名称" prop="title">
-                    <el-input v-model="form.title" placeholder="请输入" style="width: 95%"></el-input>
-                </el-form-item>
-                <el-form-item label="图文详情" prop="content">
-                    <i-editor :defaultContent="form.content" @on-change-content="onChangeEditor" style="width: 95%"/>
+                <el-form-item label="风格名称" prop="name">
+                    <el-input v-model="form.name" placeholder="请输入风格昵称" style="width: 95%"></el-input>
                 </el-form-item>
             </el-form>
 
@@ -27,26 +24,22 @@
 </template>
 
 <script>
-    import { get, update } from "../../service/system-article";
-    import IEditor from '@/framework/components/editor/editor'
+    import { get, update } from "../../service/works-classify";
+
     export default {
-        name: "create",
+        name: "edit",
         data() {
             return {
                 form: {},
-                data: null,
-                rules: {
-                    title: [
-                        { required: true, message: "请输入", trigger: "blur" }
+                rules:{
+                    name: [
+                        { required: true, message: "请输入", trigger: 'blur' }
                     ],
-                    content: [
-                        { required: true, validator: this.validateContent, trigger: "blur" }
+                    type: [
+                        { required: true, message: "请输入", trigger: 'change' }
                     ]
-                }
+                },
             }
-        },
-        components:{
-            IEditor
         },
         props: {
             dialogVisible: {
@@ -57,7 +50,7 @@
                 type: String
             }
         },
-        watch: {
+        watch:{
             dialogVisible(val) {
                 if (val) {
                     this.getData()
@@ -65,13 +58,6 @@
             }
         },
         methods: {
-            validateContent(rule, value, callback) {
-                if (!value || value === '') {
-                    callback(new Error('请输入图文详情'))
-                } else {
-                    callback()
-                }
-            },
             getData() {
                 get({id: this.editId}, res => {
                     this.form = res
@@ -85,24 +71,16 @@
                 this.$refs[name].validate((valid) => {
                     if (!valid) return false
                     let param = {
-                        page:{
-                            id: this.editId,
-                            title: this.form.title,
-                            content: this.form.content,
-                            location: this.form.location
-                        }
+                        garmentProducts: this.form
                     }
                     update(param, res => {
-                        if (res === 204) {
-                            this.$message.success("修改成功！")
+                        if (res) {
+                            this.$message.success("修改成功!")
                             this.handleClose()
                             this.$emit('onRefreshData')
                         }
                     })
                 })
-            },
-            onChangeEditor(val) {
-                this.form.content = val.html
             },
         }
     }

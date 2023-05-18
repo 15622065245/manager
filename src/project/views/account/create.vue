@@ -23,14 +23,14 @@
                             <el-input v-model="form.phone" placeholder="请输入" style="width: 95%"></el-input>
                         </el-form-item>
                         <el-form-item label="状态" prop="enabled">
-                            <el-radio v-model="form.enabled" label="1">启用</el-radio>
-                            <el-radio v-model="form.enabled" label="2">禁用</el-radio>
+                            <el-radio v-model="form.enabled" :label="true">启用</el-radio>
+                            <el-radio v-model="form.enabled" :label="false">禁用</el-radio>
                         </el-form-item>
                     </el-form>
 
             <div slot="footer" class="dialog-footer">
-                <el-button class="theme" size="small" @click="handleConfirm('formValidate')">提交</el-button>
                 <el-button size="small" @click="handleClose">取消</el-button>
+                <el-button type="primary" size="small" @click="handleConfirm('formValidate')">提交</el-button>
             </div>
         </el-dialog>
     </div>
@@ -45,6 +45,11 @@
             return {
                 activeName: 'first',
                 form: {
+                    username: "",
+                    password: "",
+                    realname: "",
+                    phone: "",
+                    enabled: true
                 },
                 rules: {
                     username: [
@@ -58,6 +63,7 @@
                     ],
                     phone: [
                         { required: true, message: '请输入手机号', trigger: 'blur' },
+                        { pattern: /^1[3456789]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }
                     ],
                     enabled: [
                         { required: true, message: '请输入状态', trigger: 'blur' },

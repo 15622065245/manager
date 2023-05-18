@@ -20,7 +20,7 @@
 
             <div slot="footer" class="dialog-footer">
                 <el-button size="small" @click="handleClose">取消</el-button>
-                <el-button class="theme" size="small" @click="handleConfirm('formValidate')">确定</el-button>
+                <el-button type="primary" size="small" @click="handleConfirm('formValidate')">确定</el-button>
             </div>
         </el-dialog>
     </div>
@@ -35,7 +35,10 @@
         data() {
 
             return {
-                form: {},
+                form: {
+                    title: "",
+                    content: ""
+                },
                 rules: {
                     title: [
                         { required: true, message: "请输入", trigger: 'blur' }

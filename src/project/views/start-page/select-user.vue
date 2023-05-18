@@ -65,7 +65,7 @@
                             @current-change="handleCurrentChange"
                             :current-page="page"
                             :page-sizes="[10, 20, 50, 100]"
-                            :page-size="10"
+                            :page-size="pageSize"
                             layout="total, sizes, prev, pager, next, jumper"
                             :total="total">
                     </el-pagination>
@@ -73,7 +73,7 @@
             </el-col>
             <el-col style="display: flex;justify-content: center">
                 <el-button size="small" style="margin-top: 20px;" @click="handleClose">取消</el-button>
-                <el-button size="small" style="margin-top: 20px;" @click="handleConfirm">确定</el-button>
+                <el-button type="primary" size="small" style="margin-top: 20px;" @click="handleConfirm">确定</el-button>
             </el-col>
         </el-row>
     </el-dialog>

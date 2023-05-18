@@ -1,91 +1,84 @@
 <template>
-    <div class="identity">
-        <el-row class="searchContent">
-            <el-col :span="22" class="search-wrapper">
-                <search :search-items="searchItems" @on-search="searchBySearchItem"></search>
-            </el-col>
-        </el-row>
-        <el-row style="margin: 10px 40px 0 0">
-            <el-col :span="24">
-                <el-table
-                        stripe
-                        :data="tableData"
-                        :header-cell-style="{background:'#f2f2f2'}"
-                        @selection-change="handleSelectionChange"
-                        style="width: 100%">
-                    <el-table-column
-                            type="selection"
-                            width="55">
-                    </el-table-column>
-                    <el-table-column
-                            prop="id"
-                            label="ID"
-                            align="center">
-                    </el-table-column>
-                    <el-table-column
-                            prop="user.phone"
-                            label="手机号"
-                            align="center">
-                    </el-table-column>
-                    <el-table-column
-                            prop="user.nickname"
-                            align="center"
-                            label="用户昵称">
-                    </el-table-column>
-                    <el-table-column
-                            prop="identity"
-                            align="center"
-                            label="申请身份">
-                    </el-table-column>
-                    <el-table-column
-                            prop="homeName"
-                            align="center"
-                            label="主页名称">
-                    </el-table-column>
-                    <el-table-column
-                            prop="iDCard"
-                            align="center"
-                            label="身份证号">
-                    </el-table-column>
-                    <el-table-column
-                            prop="applicationTime"
-                            align="center"
-                            label="申请认证时间">
-                    </el-table-column>
-                    <el-table-column
-                            prop="status"
-                            align="center"
-                            label="状态">
-                    </el-table-column>
-                    <el-table-column
-                            prop="option"
-                            align="center"
-                            width="240"
-                            label="操作">
-                        <template slot-scope="scope">
-                            <el-button v-if="scope.row.status === 'pending'" size="small" class="optionButton" @click="handleAudit(scope.row.id)">通过</el-button>
-                            <el-button v-if="scope.row.status === 'pending'" size="small" class="optionButton" @click="handleReject(scope.row.id)">拒绝</el-button>
-                            <el-button size="small" class="optionButton" @click="handleShow(scope.row.id)">查看</el-button>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </el-col>
-        </el-row>
-        <el-row class="page">
-            <el-col :span="24">
-                <div class="pager-group" style="float: left">
-                    <el-pagination
-                            @size-change="handleSizeChange"
-                            @current-change="handleCurrentChange"
-                            :current-page="page"
-                            :page-sizes="[10, 20, 50, 100]"
-                            :page-size="10"
-                            layout="total, sizes, prev, pager, next, jumper"
-                            :total="total">
-                    </el-pagination>
-                </div>
-            </el-col>
-        </el-row>
+    <el-row>
+        <el-col :span="22" style="margin-top: 20px">
+            <search :search-items="searchItems" @on-search="searchBySearchItem"></search>
+        </el-col>
+        <el-col :span="24" style="margin: 20px 0">
+            <el-table
+                    stripe
+                    :data="tableData"
+                    :header-cell-style="{background:'#f2f2f2'}"
+                    style="width: 100%">
+                <el-table-column
+                        type="selection"
+                        width="55">
+                </el-table-column>
+                <el-table-column
+                        prop="id"
+                        label="ID"
+                        align="center">
+                </el-table-column>
+                <el-table-column
+                        prop="user.phone"
+                        label="手机号"
+                        align="center">
+                </el-table-column>
+                <el-table-column
+                        prop="user.nickname"
+                        align="center"
+                        label="用户昵称">
+                </el-table-column>
+                <el-table-column
+                        prop="identity"
+                        align="center"
+                        label="申请身份">
+                </el-table-column>
+                <el-table-column
+                        prop="homeName"
+                        align="center"
+                        label="主页名称">
+                </el-table-column>
+                <el-table-column
+                        prop="iDCard"
+                        align="center"
+                        label="身份证号">
+                </el-table-column>
+                <el-table-column
+                        prop="applicationTime"
+                        align="center"
+                        label="申请认证时间">
+                </el-table-column>
+                <el-table-column
+                        prop="status"
+                        align="center"
+                        label="状态">
+                </el-table-column>
+                <el-table-column
+                        prop="option"
+                        align="center"
+                        width="240"
+                        label="操作">
+                    <template slot-scope="scope">
+                        <el-button v-if="scope.row.status === 'pending'" size="small" class="optionButton" @click="handleAudit(scope.row.id)">通过</el-button>
+                        <el-button v-if="scope.row.status === 'pending'" size="small" class="optionButton" @click="handleReject(scope.row.id)">拒绝</el-button>
+                        <el-button type="text" size="small" class="optionButton" @click="handleShow(scope.row.id)">查看</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-col>
+        <el-col :span="24">
+            <div class="pager-group" style="float: left">
+                <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="page"
+                        :page-sizes="[10, 20, 50, 100]"
+                        :page-size="pageSize"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="total">
+                </el-pagination>
+            </div>
+        </el-col>
         <!-- 审核通过弹框-->
         <el-dialog
                 title="通过"
@@ -95,9 +88,9 @@
                 <span style="margin-left: 20px">确定审核通过吗?</span>
             </div>
             <span slot="footer" class="dialog-footer">
-            <el-button size="small" @click="auditVisible = false">取 消</el-button>
-            <el-button size="small" type="primary" @click="auditVisible = false">确 定</el-button>
-          </span>
+        <el-button size="small" @click="auditVisible = false">取 消</el-button>
+        <el-button size="small" type="primary" @click="auditVisible = false">确 定</el-button>
+      </span>
         </el-dialog>
         <!-- 审核拒绝弹框-->
         <el-dialog
@@ -109,16 +102,17 @@
                 <el-input v-model="reject" placeholder="拒绝理由"></el-input>
             </div>
             <span slot="footer" class="dialog-footer">
-            <el-button size="small" @click="rejectVisible = false">取 消</el-button>
-            <el-button size="small" type="primary" @click="rejectVisible = false">确 定</el-button>
-          </span>
+        <el-button size="small" @click="rejectVisible = false">取 消</el-button>
+        <el-button size="small" type="primary" @click="rejectVisible = false">确 定</el-button>
+      </span>
         </el-dialog>
-    </div>
+    </el-row>
 </template>
 
 <script>
     import Search from '@/framework/components/search'
     import {passIdentification, getIdentificationList, count} from "../../service/identity";
+    import {pass} from "../../service/model";
 
     export default {
         name: "user",
@@ -126,18 +120,9 @@
             Search
         },
         data() {
-            const item = {
-                id: "001",
-                phone: 18307681234,
-                name: "我是用户",
-                identity: "模特",
-                homeName: "周乐心",
-                idNumber: 441600000,
-                applyTime: '2025-01-18 15:00',
-                status: '待审核'
-            }
+
             return {
-                tableData: new Array(5).fill(item),
+                tableData: [],
                 searchItems: [
                     {
                         name: '用户昵称',
@@ -171,14 +156,12 @@
                 input: "",
                 page: 1,
                 pageSize: 10,
-                // 扫描标记
-                value: '',
-                value1: '',
                 auditVisible: false,
                 rejectVisible: false,
                 reject: "",
                 searchData: [],
-                total: 0
+                total: 0,
+                rejectId: ""
             }
         },
         mounted() {
@@ -224,14 +207,14 @@
                     }
                 }
                 getIdentificationList(param, res => {
+                    res.forEach(item => {
+                        item.id = item.id.toString()
+                    })
                     this.tableData = res
                 })
                 count(param, res => {
                     this.total = res
                 })
-            },
-            handleSelectionChange(val) {
-                console.log(val)
             },
             //分页
             handleSizeChange(pageSize) {
@@ -242,49 +225,47 @@
                 this.page = page
                 this.find()
             },
-            handleAudit() {
-              this.auditVisible = true
+            handleAudit(id) {
+                this.$confirm(`确定要审核通过吗?`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(() => {
+                    passIdentification({id: id, passed: true}, res => {
+                        if (res === 204) {
+                            this.$message.success(`审核通过成功！`)
+                            this.find()
+                        }
+                    })
+                }).catch(() => {
+                })
             },
-            handleReject() {
+            handleReject(id) {
+                this.rejectId = id
                 this.rejectVisible = true
             },
+            confirmReject() {
+                let param = {
+                    id: this.rejectId,
+                    passed: false,
+                    reason: this.reject
+                }
+                pass(param, res => {
+                    if (res === 204) {
+                        this.$message.success(`审核拒绝成功！`)
+                        this.rejectVisible = false
+                        this.find()
+                    }
+                })
+            },
             handleShow(id) {
-                console.log(id)
-                // this.createVisible = true
-                this.$router.push({name: 'identityShow'})
+                this.$router.push({name: 'identityShow', params: {id: id}})
             },
         }
     }
 </script>
 
 <style lang="less" scoped>
-    .labelManage {
-
-        .addButton {
-            margin-top: 20px;
-        }
-
-    }
-    /deep/ .el-dialog {
-        border-radius: 10px;
-
-        .el-dialog__header {
-            font-weight: 600;
-            border-bottom: 1px solid #e4e4e4;
-        }
-        .el-form-item {
-            margin-top: 15px;
-        }
-        .el-form-item:first-child {
-            margin-top: 0px;
-        }
-        .el-dialog__footer {
-            margin-top: 40px;
-        }
-    }
-    /deep/ .optionButton {
-        border: none;
-    }
-
 
 </style>

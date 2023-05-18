@@ -64,8 +64,8 @@
             </el-form>
 
             <div slot="footer" class="dialog-footer">
-                <el-button class="theme" size="small" @click="handleConfirm('formValidate')">提交</el-button>
                 <el-button size="small" @click="handleClose">取消</el-button>
+                <el-button type="primary" size="small" @click="handleConfirm('formValidate')">提交</el-button>
             </div>
         </el-dialog>
         <select-works :dialogVisible="seletctDialogVisible" @on-dialog-close="seletctHandleClose" @selectWork="selectWork"></select-works>
@@ -177,15 +177,12 @@
             },
             selectWork(id) {
                 this.workId = id
-                console.log("我拿到了workId", id)
             },
             selectUser(id) {
                 this.userId = id
-                console.log("我拿到了userId", id)
             },
             selectImageText(obj) {
                 this.contentObj = obj
-                console.log("我拿到了contentObj", obj)
             },
             handleTransportFileList(fileList) {
                 if (fileList.length > 0) {

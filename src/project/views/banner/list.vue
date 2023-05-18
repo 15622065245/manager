@@ -1,10 +1,10 @@
 <template>
-        <el-row class="searchContent">
-            <el-col :span="24" style="margin: 30px 0 20px 0">
+        <el-row>
+            <el-col :span="24" style="margin-top: 20px">
                 <search :search-items="searchItems" @on-search="searchBySearchItem"></search>
             </el-col>
-            <el-col :span="24">
-                <el-button class="btn addButton" size="small" @click="addHandle">新建</el-button>
+            <el-col :span="24" style="margin: 20px 0">
+                <el-button type="primary" size="small" @click="addHandle">新建</el-button>
 
             </el-col>
             <el-col :span="24">
@@ -66,43 +66,29 @@
                             align="center"
                             label="操作">
                         <template slot-scope="scope">
-                            <el-button size="small" class="optionButton" @click="editHandle(scope.row.id)">编辑</el-button>
-                            <el-button size="small" class="optionButton" @click="deleteHandle(scope.row.id)">删除</el-button>
+                            <el-button type="text" size="small" class="optionButton" @click="editHandle(scope.row.id)">编辑</el-button>
+                            <el-button type="text" style="color: red" size="small" class="optionButton" @click="deleteHandle(scope.row.id)">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
             </el-col>
-            <el-col :span="24">
+            <el-col :span="24" style="margin-top: 20px">
                 <div class="pager-group" style="float: left">
                     <el-pagination
                             @size-change="handleSizeChange"
                             @current-change="handleCurrentChange"
                             :current-page="page"
                             :page-sizes="[10, 20, 50, 100]"
-                            :page-size="10"
+                            :page-size="pageSize"
                             layout="total, sizes, prev, pager, next, jumper"
                             :total="total">
                     </el-pagination>
                 </div>
             </el-col>
             <el-col :span="24">
-
             </el-col>
             <Icreate :dialog-visible="createVisible" @on-dialog-close="handleClose" @onRefreshData="find"></Icreate>
             <Iedit :dialog-visible="editVisible" :editId="editId" @on-dialog-close="handleClose" @onRefreshData="find"></Iedit>
-            <el-dialog
-                    title="删除"
-                    :visible.sync="deleteVisible"
-                    :modal-append-to-body="false"
-                    width="30%">
-                <div style="display: flex;align-items: center">
-                    <span style="margin-left: 20px">删除后不可恢复，是否确定删除?</span>
-                </div>
-                <span slot="footer" class="dialog-footer">
-            <el-button size="small" @click="deleteVisible = false">取 消</el-button>
-            <el-button size="small" type="primary" @click="handleConfirm">确 定</el-button>
-          </span>
-            </el-dialog>
         </el-row>
 
 </template>
@@ -112,9 +98,10 @@
     import Iedit from "./edit";
     import Search from '@/framework/components/search'
     import {findByTable, count, deleteSlide,enableSlide} from "../../service/advertising";
+    import {deleteReport} from "../../service/report";
 
     export default {
-        name: "sensitive-title",
+        name: "list",
         components:{
             Icreate,
             Iedit,
@@ -147,10 +134,8 @@
                 total: 0,
                 createVisible: false,
                 editVisible: false,
-                deleteVisible: false,
                 roleVisible: false,
                 searchData: [],
-                deleteId: "",
                 editId: ""
 
             }
@@ -237,27 +222,29 @@
                 this.editVisible = true
             },
             deleteHandle(id) {
-                this.deleteId = id
-                this.deleteVisible = true
+                this.$confirm(`确定要删除吗?`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(() => {
+                    deleteSlide({id: id}, res => {
+                        if (res === 204) {
+                            this.$message.success(`删除成功！`)
+                            this.find()
+                        }
+                    })
+                }).catch(() => {
+                })
             },
             roleHandle() {
               this.roleVisible = true
             },
-
             handleClose() {
                 this.createVisible = false
                 this.editVisible = false
                 this.roleVisible = false
             },
-            handleConfirm() {
-                deleteSlide({id: this.deleteId}, res => {
-                    if (res) {
-                        this.$message.success("删除成功！")
-                        this.deleteVisible = false
-                        this.find()
-                    }
-                })
-            }
         }
     }
 </script>

@@ -14,8 +14,8 @@
                     </el-form-item>
                 </el-form>
                 <div class="footer">
-                    <el-button class="btn" type="info" @click="handleClose">取消</el-button>
-                    <el-button type="primary" @click="handleConfirm">确定</el-button>
+                    <el-button size="small" class="btn" type="info" @click="handleClose">取消</el-button>
+                    <el-button size="small" type="primary" @click="handleConfirm">确定</el-button>
                 </div>
             </div>
         </el-card>

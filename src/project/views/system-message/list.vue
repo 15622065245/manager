@@ -1,11 +1,10 @@
 <template>
-    <div class="account">
-        <el-row class="searchContent">
-            <el-col :span="24" style="margin: 30px 0 20px 0">
+        <el-row>
+            <el-col :span="24" style="margin-top: 20px">
                 <search :search-items="searchItems" @on-search="searchBySearchItem"></search>
             </el-col>
-            <el-col :span="24">
-                <el-button class="btn addButton" size="small" @click="createHandle">新建</el-button>
+            <el-col :span="24" style="margin: 20px 0">
+                <el-button type="primary" size="small" @click="createHandle">新建</el-button>
             </el-col>
             <el-col :span="24">
                 <el-table
@@ -27,6 +26,13 @@
                             prop="userList"
                             label="推送对象"
                             align="center">
+                        <template slot-scope="scope">
+                            <span v-for="(item, index) in scope.row.userList">
+                            {{item.nickname}}
+                            <span v-if="index !== scope.row.userList.length - 1">、</span>
+                        </span>
+                        </template>
+
                     </el-table-column>
                     <el-table-column
                             prop="creationTime"
@@ -38,42 +44,26 @@
                             align="center"
                             label="操作">
                         <template slot-scope="scope">
-                            <el-button size="small" class="optionButton" @click="showHandle(scope.row.userList)">查看</el-button>
-                            <el-button size="small" class="optionButton" @click="deleteHandle(scope.row.id)">删除</el-button>
+                            <el-button type="text" size="small" class="optionButton" @click="showHandle(scope.row.id)">查看</el-button>
+                            <el-button type="text" style="color: red" size="small" class="optionButton" @click="deleteHandle(scope.row.id)">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
             </el-col>
-            <el-col :span="24">
+            <el-col :span="24" style="margin-top: 20px">
                 <div class="pager-group" style="float: left">
                     <el-pagination
                             @size-change="handleSizeChange"
                             @current-change="handleCurrentChange"
                             :current-page="page"
                             :page-sizes="[10, 20, 50, 100]"
-                            :page-size="10"
+                            :page-size="pageSize"
                             layout="total, sizes, prev, pager, next, jumper"
                             :total="total">
                     </el-pagination>
                 </div>
             </el-col>
-            <!-- 删除弹框-->
-            <el-dialog
-                    title="删除"
-                    :visible.sync="deleteVisible"
-                    :modal-append-to-body="false"
-                    width="30%">
-                <div style="display: flex;align-items: center">
-                    <span style="margin-left: 20px">删除后不可恢复，是否确定删除?</span>
-                </div>
-                <span slot="footer" class="dialog-footer">
-            <el-button size="small" @click="deleteVisible = false">取 消</el-button>
-            <el-button size="small" type="primary" @click="deleteVisible = false">确 定</el-button>
-          </span>
-            </el-dialog>
         </el-row>
-
-    </div>
 </template>
 
 <script>
@@ -106,7 +96,6 @@
                 total: 0,
                 createVisible: false,
                 editVisible: false,
-                deleteVisible: false,
                 roleVisible: false,
                 searchData: []
             }
@@ -187,9 +176,8 @@
             createHandle() {
                 this.$router.push({name: 'systemMessageCreate'})
             },
-            showHandle(data) {
-                console.log("data", data)
-                this.$router.push({name: 'systemMessageShow', params: {userList: data}})
+            showHandle(id) {
+                this.$router.push({name: 'systemMessageShow', params: {id: id}})
             },
             handleClose() {
                 this.createVisible = false

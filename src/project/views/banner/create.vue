@@ -8,6 +8,7 @@
                 :before-close="handleClose"
                 v-dialogDrag
                 :close-on-click-modal="false"
+                v-if="dialogVisible"
         >
                     <el-form ref="formValidate" :rules="rules" :model="form" label-width="100px">
                         <el-form-item label="广告位" prop="location">
@@ -55,16 +56,16 @@
                                 <el-radio @click.native="userClick" v-model="form.type" label="user">用户主页</el-radio>
                             </el-col>
                             <el-col>
-                                <span v-if="form.type=== 'work'">已选作品id：{{workId}}</span>
-                                <span v-if="form.type=== 'user'">已选用户主页id：{{userId}}</span>
+                                <span v-if="form.type=== 'work' && workId">作品id：{{workId}}</span>
+                                <span v-if="form.type=== 'user' && userId">用户id：{{userId}}</span>
                             </el-col>
 
                         </el-form-item>
                     </el-form>
 
             <div slot="footer" class="dialog-footer">
-                <el-button class="theme" size="small" @click="handleConfirm('formValidate')">提交</el-button>
                 <el-button size="small" @click="handleClose">取消</el-button>
+                <el-button type="primary" size="small" @click="handleConfirm('formValidate')">提交</el-button>
             </div>
         </el-dialog>
         <select-works :dialogVisible="seletctDialogVisible" @on-dialog-close="seletctHandleClose" @selectWork="selectWork"></select-works>
@@ -98,7 +99,8 @@
             }
             return {
                 form: {
-                    location: "banner"
+                    location: "banner",
+                    image: "",
                 },
                 seletctDialogVisible: false,
                 userDialogVisible: false,
@@ -156,15 +158,12 @@
             },
             selectWork(id) {
                 this.workId = id
-                console.log("我拿到了workId", id)
             },
             selectUser(id) {
                 this.userId = id
-                console.log("我拿到了userId", id)
             },
             selectImageText(obj) {
                 this.contentObj = obj
-                console.log("我拿到了contentObj", obj)
             },
             handleTransportFileList(fileList) {
                 if (fileList.length > 0) {

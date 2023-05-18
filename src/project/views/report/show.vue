@@ -49,7 +49,7 @@
 </template>
 
 <script>
-    import { getFeedback } from "../../service/feedback";
+    import { getReport } from "../../service/report";
 
     export default {
         name: "show",
@@ -59,7 +59,7 @@
             }
         },
         mounted() {
-            getFeedback({id: this.$route.params.id}, res => {
+            getReport({id: this.$route.params.id}, res => {
                 this.info = res
             })
         },

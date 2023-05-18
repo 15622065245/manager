@@ -10,7 +10,7 @@
             :default-checked-keys="checkedKeys"
             :props="defaultProps">
         </el-tree>
-        <el-button @click="handleConfirm" size="small" style="margin: 20px 0 0 20px">保存</el-button>
+        <el-button type="primary" @click="handleConfirm" size="small" style="margin: 20px 0 0 20px">保存</el-button>
     </div>
 </template>
 

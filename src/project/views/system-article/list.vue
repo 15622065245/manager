@@ -1,9 +1,9 @@
 <template>
-        <el-row class="searchContent">
-            <el-col :span="24">
+        <el-row>
+            <el-col :span="24" style="margin-top: 20px">
                 <search :search-items="searchItems" @on-search="searchBySearchItem"></search>
             </el-col>
-            <el-col :span="24">
+            <el-col :span="24" style="margin: 20px 0">
                 <el-table
                         stripe
                         :data="tableData"
@@ -36,8 +36,8 @@
                             align="center"
                             label="操作">
                         <template slot-scope="scope">
-                            <el-button size="small" class="optionButton" @click="editHandle(scope.row.id)">编辑</el-button>
-                            <el-button size="small" class="optionButton" @click="showHandle(scope.row.id)">查看</el-button>
+                            <el-button type="text" size="small" class="optionButton" @click="editHandle(scope.row.id)">编辑</el-button>
+                            <el-button type="text" size="small" class="optionButton" @click="showHandle(scope.row.id)">查看</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -49,27 +49,13 @@
                             @current-change="handleCurrentChange"
                             :current-page="page"
                             :page-sizes="[10, 20, 50, 100]"
-                            :page-size="10"
+                            :page-size="pageSize"
                             layout="total, sizes, prev, pager, next, jumper"
                             :total="total">
                     </el-pagination>
                 </div>
             </el-col>
-            <!-- 修改目录弹框-->
             <Iedit :dialog-visible="editVisible" :editId="editId" @on-dialog-close="handleClose" @onRefreshData="find"></Iedit>
-            <!-- 删除弹框-->
-            <el-dialog
-                    title="删除"
-                    :visible.sync="deleteVisible"
-                    width="30%">
-                <div style="display: flex;align-items: center">
-                    <span style="margin-left: 20px">删除后不可恢复，是否确定删除?</span>
-                </div>
-                <span slot="footer" class="dialog-footer">
-            <el-button size="small" @click="deleteVisible = false">取 消</el-button>
-            <el-button size="small" type="primary" @click="deleteVisible = false">确 定</el-button>
-          </span>
-            </el-dialog>
         </el-row>
 
 </template>
@@ -106,7 +92,6 @@
                 total: 0,
                 createVisible: false,
                 editVisible: false,
-                deleteVisible: false,
                 roleVisible: false,
                 searchData: [],
                 editId: null
@@ -176,9 +161,7 @@
                 this.editVisible = false
                 this.roleVisible = false
             },
-            handleConfirm() {
 
-            }
         }
     }
 </script>
