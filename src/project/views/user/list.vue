@@ -1,104 +1,96 @@
 <template>
-    <div class="user">
-        <el-row class="searchContent">
-            <el-col :span="22" class="search-wrapper">
-                <search :search-items="searchItems" @on-search="searchBySearchItem"></search>
-            </el-col>
-        </el-row>
-        <el-row style="margin-top: 30px">
-            <el-col :span="24">
-                <el-button size="small" @click="handleBatchEnable(true)">批量启用</el-button>
-                <el-button size="small" @click="handleBatchEnable(false)">批量禁用</el-button>
-            </el-col>
-        </el-row>
-        <el-row style="margin: 10px 40px 0 0">
-            <el-col :span="24">
-                <el-table
-                        stripe
-                        :data="tableData"
-                        :header-cell-style="{background:'#f2f2f2'}"
-                        @selection-change="handleSelectionChange"
-                        style="width: 100%">
-                    <el-table-column
-                            type="selection"
-                            width="55">
-                    </el-table-column>
-                    <el-table-column
-                            prop="id"
-                            label="ID"
-                            align="center">
-                    </el-table-column>
-                    <el-table-column
-                            prop="phone"
-                            label="手机号"
-                            align="center">
-                    </el-table-column>
-                    <el-table-column
-                            prop="nickname"
-                            align="center"
-                            label="用户昵称">
-                    </el-table-column>
-                    <el-table-column
-                            prop="identity"
-                            align="center"
-                            label="身份">
-                    </el-table-column>
-                    <el-table-column
-                            prop="datetime"
-                            align="center"
-                            label="主页名称">
-                    </el-table-column>
-                    <el-table-column
-                            prop="creationTime"
-                            align="center"
-                            label="注册时间">
-                    </el-table-column>
-                    <el-table-column
-                            prop="name"
-                            align="center"
-                            label="最近登录时间">
-                    </el-table-column>
-                    <el-table-column
-                            prop="enabled"
-                            align="center"
-                            label="状态">
-                        <template slot-scope="scope">
-                            <el-switch
-                                    :value="scope.row.enabled"
-                                    active-text="启用"
-                                    inactive-text="禁用"
-                                    @change="handleEnable(scope.row.enabled, scope.row.id)">
-                            </el-switch>
-                        </template>
-                    </el-table-column>
-                    <el-table-column
-                            prop="option"
-                            align="center"
-                            label="操作">
-                        <template slot-scope="scope">
-                            <el-button size="small" class="optionButton" @click="handleShow(scope.row.id)">查看
-                            </el-button>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </el-col>
-        </el-row>
-        <el-row class="page">
-            <el-col :span="24">
-                <div class="pager-group" style="float: left">
-                    <el-pagination
-                            @size-change="handleSizeChange"
-                            @current-change="handleCurrentChange"
-                            :current-page="page"
-                            :page-sizes="[10, 20, 50, 100]"
-                            :page-size="10"
-                            layout="total, sizes, prev, pager, next, jumper"
-                            :total="total">
-                    </el-pagination>
-                </div>
-            </el-col>
-        </el-row>
-    </div>
+    <el-row>
+        <el-col :span="22" style="margin-top: 20px">
+            <search :search-items="searchItems" @on-search="searchBySearchItem"></search>
+        </el-col>
+        <el-col :span="24" style="margin: 20px 0">
+            <el-button type="primary" size="small" @click="handleBatchEnable(true)">批量启用</el-button>
+            <el-button type="primary" size="small" @click="handleBatchEnable(false)">批量禁用</el-button>
+        </el-col>
+        <el-col :span="24">
+            <el-table
+                    stripe
+                    :data="tableData"
+                    :header-cell-style="{background:'#f2f2f2'}"
+                    @selection-change="handleSelectionChange"
+                    style="width: 100%">
+                <el-table-column
+                        type="selection"
+                        width="55">
+                </el-table-column>
+                <el-table-column
+                        prop="id"
+                        label="ID"
+                        align="center">
+                </el-table-column>
+                <el-table-column
+                        prop="phone"
+                        label="手机号"
+                        align="center">
+                </el-table-column>
+                <el-table-column
+                        prop="nickname"
+                        align="center"
+                        label="用户昵称">
+                </el-table-column>
+                <el-table-column
+                        prop="identity"
+                        align="center"
+                        label="身份">
+                </el-table-column>
+                <el-table-column
+                        prop="datetime"
+                        align="center"
+                        label="主页名称">
+                </el-table-column>
+                <el-table-column
+                        prop="creationTime"
+                        align="center"
+                        label="注册时间">
+                </el-table-column>
+                <el-table-column
+                        prop="name"
+                        align="center"
+                        label="最近登录时间">
+                </el-table-column>
+                <el-table-column
+                        prop="enabled"
+                        align="center"
+                        label="状态">
+                    <template slot-scope="scope">
+                        <el-switch
+                                :value="scope.row.enabled"
+                                active-text="启用"
+                                inactive-text="禁用"
+                                @change="handleEnable(scope.row.enabled, scope.row.id)">
+                        </el-switch>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="option"
+                        align="center"
+                        label="操作">
+                    <template slot-scope="scope">
+                        <el-button type="text" size="small" @click="handleShow(scope.row.id)">查看
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-col>
+        <el-col :span="24" style="margin-top: 20px">
+            <div class="pager-group" style="float: left">
+                <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="page"
+                        :page-sizes="[10, 20, 50, 100]"
+                        :page-size="pageSize"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="total">
+                </el-pagination>
+            </div>
+        </el-col>
+    </el-row>
 </template>
 
 <script>
@@ -197,7 +189,6 @@
                         item.id = item.id.toString()
                     })
                     this.tableData = res
-                    console.log("table", this.tableData)
                 })
                 count(param, res => {
                     this.total = res
@@ -250,8 +241,6 @@
                 this.find()
             },
             handleShow(id) {
-                // this.createVisible = true
-                console.log("id", id)
                 this.$router.push({name: 'userShow', params: {id: id}})
             },
         }
@@ -259,38 +248,4 @@
 </script>
 
 <style lang="less" scoped>
-    .labelManage {
-
-        .addButton {
-            margin-top: 20px;
-        }
-
-    }
-
-    /deep/ .el-dialog {
-        border-radius: 10px;
-
-        .el-dialog__header {
-            font-weight: 600;
-            border-bottom: 1px solid #e4e4e4;
-        }
-
-        .el-form-item {
-            margin-top: 15px;
-        }
-
-        .el-form-item:first-child {
-            margin-top: 0px;
-        }
-
-        .el-dialog__footer {
-            margin-top: 40px;
-        }
-    }
-
-    /deep/ .optionButton {
-        border: none;
-    }
-
-
 </style>

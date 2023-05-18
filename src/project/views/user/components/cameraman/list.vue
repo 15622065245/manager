@@ -1,42 +1,14 @@
 <template>
     <div class="model">
         <el-row class="searchContent">
-            <el-col :span="24" style="margin: 30px 0 20px 0">
-                <span class="labelText" style="margin-right: 10px">作品标题</span>
-                <el-input v-model="input" placeholder="请输入" style="margin-right: 50px"></el-input>
-                <span class="labelText" style="margin-right: 10px">风格</span>
-                <el-input v-model="input" placeholder="请输入" style="margin-right: 50px"></el-input>
-                <span class="labelText" style="margin-right: 10px">衣品</span>
-                <el-input v-model="input" placeholder="请输入" style="margin-right: 50px"></el-input>
-                <span class="labelText" style="margin-right: 10px">主页名称</span>
-                <el-input v-model="input" placeholder="请输入" style="margin-right: 50px"></el-input>
-
-            </el-col>
-            <el-col :span="24" style="margin-bottom:20px">
-                <span class="labelText" style="margin-right: 10px">状态</span>
-                <el-select v-model="form.desensitization" placeholder="请选择" style="margin-right: 50px">
-                    <el-option
-                            v-for="item in options"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
-                    </el-option>
-                </el-select>
-                <span class="labelText" style="margin-right: 10px">上架时间</span>
-                <el-date-picker
-                        v-model="value1"
-                        type="daterange"
-                        range-separator="至"
-                        start-placeholder="开始日期"
-                        end-placeholder="结束日期">
-                </el-date-picker>
-                <el-button class="find btn" icon="el-icon-search" size="small">查询</el-button>
+            <el-col :span="24" class="search-wrapper">
+                <search :search-items="searchItems" @on-search="searchBySearchItem"></search>
             </el-col>
         </el-row>
         <el-row>
             <el-col :span="24">
-                <el-button class="btn addButton" size="small">批量上架</el-button>
-                <el-button class="btn addButton" size="small">批量下架</el-button>
+                <el-button type="primary" @click="handleBatchSellable(true)"  size="small">批量上架</el-button>
+                <el-button type="primary" @click="handleBatchSellable(false)" size="small">批量下架</el-button>
             </el-col>
         </el-row>
         <el-row style="margin: 10px 40px 0 0">
@@ -74,16 +46,28 @@
                             prop="style"
                             align="center"
                             label="风格">
+                        <template slot-scope="scope">
+                        <span v-for="(item, index) in scope.row.styleList">
+                            {{item.name}}
+                            <span v-if="index !== scope.row.styleList.length - 1">、</span>
+                        </span>
+                        </template>
                     </el-table-column>
                     <el-table-column
-                            prop="clothing"
+                            prop="garmentProductsList"
                             align="center"
                             label="衣品">
+                        <template slot-scope="scope">
+                        <span v-for="(item, index) in scope.row.garmentProductsList">
+                            {{item.name}}
+                            <span v-if="index !== scope.row.garmentProductsList.length - 1">、</span>
+                        </span>
+                        </template>
                     </el-table-column>
                     <el-table-column
                             prop="photoPrice"
                             align="center"
-                            label="摄影价格">
+                            label="摄影师价格">
                     </el-table-column>
                     <el-table-column
                             prop="price"
@@ -97,12 +81,15 @@
                             width="200">
                     </el-table-column>
                     <el-table-column
-                            prop="datetime"
+                            prop="sellable"
                             align="center"
                             label="状态">
                         <template slot-scope="scope">
                             <el-switch
-                                    v-model="scope.row.status">
+                                    :value="scope.row.sellable"
+                                    active-text="上架"
+                                    inactive-text="下架"
+                                    @change="handleSellable(scope.row.sellable, scope.row.id)">
                             </el-switch>
                         </template>
                     </el-table-column>
@@ -110,10 +97,10 @@
                             prop="option"
                             align="center"
                             label="操作"
-                            width="160px">
+                            width="200px">
                         <template slot-scope="scope">
-                            <el-button size="small" class="optionButton" @click="handleDelete(scope.row.id)">删除</el-button>
-                            <el-button size="small" class="optionButton" @click="handleShow(scope.row.id)">查看</el-button>
+                            <el-button type="text" style="color: red" v-if="!scope.row.sellable" size="small" @click="handleDelete(scope.row.id)">删除</el-button>
+                            <el-button type="text" size="small" @click="handleShow(scope.row.id)">查看</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -127,172 +114,195 @@
                             @current-change="handleCurrentChange"
                             :current-page="page"
                             :page-sizes="[10, 20, 50, 100]"
-                            :page-size="10"
+                            :page-size="pageSize"
                             layout="total, sizes, prev, pager, next, jumper"
-                            :total="800">
+                            :total="total">
                     </el-pagination>
                 </div>
             </el-col>
         </el-row>
-        <!-- 删除弹框-->
-        <el-dialog
-                title="提示"
-                :visible.sync="deleteVisible"
-                width="30%">
-            <div style="display: flex;align-items: center">
-                <span style="margin-left: 20px">是否确定删除该作品?</span>
-            </div>
-            <span slot="footer" class="dialog-footer">
-            <el-button size="small" @click="deleteVisible = false">否</el-button>
-            <el-button size="small" type="primary" @click="deleteVisible = false">是</el-button>
-          </span>
-        </el-dialog>
     </div>
 </template>
 
 <script>
+    import Search from '@/framework/components/search'
+    import { getList, total, sellWorks } from "../../../../service/model";
     export default {
         name: "user",
+        components:{
+            Search
+        },
         data() {
             return {
-                searchItems: [{
-                    // name: '名称',
-                    key: 'name',
-                    type: 'string'
-                },],
-                input: "",
-                page: 10,
-                // 扫描标记
-                form: {
-                    name: "",
-                    level:"",
-                    encryption:"",
-                    desensitization:"",
-                    desc: "",
-                    testCode:""
-                },
-                options: [{
-                    value: '上架',
-                    label: '上架'
-                }, {
-                    value: '下架',
-                    label: '下架'
-                }],
-                value: '',
-                value1: '',
+                searchItems: [
+                    {
+                        name: '作品标题',
+                        key: 'title',
+                        type: 'string'
+                    },
+                    {
+                        name: '风格',
+                        key: 'styleName',
+                        type: 'string'
+                    },
+                    {
+                        name: '衣品',
+                        key: 'name',
+                        type: 'string'
+                    },
+                    {
+                        name: '状态',
+                        key: 'sellable',
+                        type: 'select',
+                        displayValue: ['上架', '下架'],
+                        value: [true, false]
+                    },
+                    {
+                        name: '上架时间',
+                        key: 'sellTime',
+                        type: 'datetimerange',
+                    }],
+                page: 1,
+                pageSize: 10,
+                form: {},
                 deleteVisible: false,
-                tableData: [{
-                    id: "001",
-                    title: '实拍韩风2023新款韩版吊带内穿',
-                    user: "小徐",
-                    homeName: "我是摄影师",
-                    style: "小清新",
-                    clothing: "御姐",
-                    photoPrice: 48,
-                    price: "783",
-                    time: '2016-05-02 12:00:00',
-                    status: "",
-                },{
-                    id: "002",
-                    title: '实拍韩风2023新款韩版',
-                    user: "小徐",
-                    homeName: "我是摄影师",
-                    style: "小清新",
-                    clothing: "御姐",
-                    photoPrice: 48,
-                    price: "783",
-                    time: '2016-05-02 12:00:00',
-                    status: "",
-                },{
-                    id: "003",
-                    title: '实拍韩风2023新款韩版',
-                    user: "小徐",
-                    homeName: "我是摄影师",
-                    style: "小清新",
-                    clothing: "御姐",
-                    photoPrice: 48,
-                    price: "783",
-                    time: '2016-05-02 12:00:00',
-                    status: "",
-                },{
-                    id: "004",
-                    title: '实拍韩风2023新款韩版吊带内穿',
-                    user: "小徐1",
-                    homeName: "我是摄影师",
-                    style: "小清新",
-                    clothing: "御姐",
-                    photoPrice: 70,
-                    price: "783",
-                    time: '2016-05-02 12:00:00',
-                    status: "",
-                },{
-                    id: "005",
-                    title: '实拍韩风2023新款韩版吊带内穿',
-                    user: "小徐",
-                    homeName: "我是摄影师",
-                    style: "小清新",
-                    clothing: "御姐",
-                    photoPrice: 90,
-                    price: "783",
-                    time: '2016-05-02 12:00:00',
-                    status: "",
-                }]
+                tableData: [],
+                searchData: {},
+                total: 0,
+                selectID: []
             }
         },
+        mounted() {
+            this.find()
+        },
         methods: {
+            // 搜索
+            searchBySearchItem(val) {
+                console.log("val", val)
+                this.searchData = val
+                this.page = 1
+                this.find()
+            },
+            //获取数据
+            find() {
+                let param = {
+                    works:{
+                        type: "photographer",
+                        status: "passed"
+                    },
+                    style:{},
+                    garmentProducts:{},
+                    user:{
+                        id: this.$route.params.id
+                    },
+                    creationTime:{},
+                    sellTime:{},
+                    pageable:{
+                        page: this.page,
+                        size: this.pageSize,
+                        sort:"id",
+                        desc:true
+                    }
+                }
+                if (this.searchData.title) {
+                    param.works.title = this.searchData.title
+                }
+                if (this.searchData.sellable !== undefined && this.searchData.sellable !== '' && this.searchData.sellable !== -1) {
+                    param.works.sellable = this.searchData.sellable
+                }
+                if (this.searchData.type) {
+                    param.works.type = this.garmentProducts.type
+                }
+                if (this.searchData.styleName) {
+                    param.style.name = this.searchData.styleName
+                }
+                if (this.searchData.sellTime) {
+                    param.sellTime = {
+                        start: this.searchData.sellTime[0],
+                        end: this.searchData.sellTime[1]
+                    }
+                }
+                console.log(param)
+                getList(param, res => {
+                    res.forEach(item => {
+                        item.id = item.id.toString()
+                    })
+                    this.tableData = res
+                    console.log("table", this.tableData)
+                })
+                total(param, res => {
+                    this.total = res
+                })
+            },
             handleSelectionChange(val) {
                 let arr = []
                 val.forEach(item => {
                     arr.push(item.id)
                 })
-                console.log(arr)
+                this.selectID = arr
             },
-            handleSizeChange() {
-
+            //单个禁用
+            handleSellable(sellable, id) {
+                this.selectID = [id]
+                this.handleBatchSellable(!sellable, 1)
             },
-            handleCurrentChange() {
-
+            //批量禁用
+            handleBatchSellable(sellable, one) {
+                let params = {
+                    idList: this.selectID,
+                    sellable: sellable
+                }
+                this.$confirm(`确定${sellable ? '启用' : '禁用'}吗?`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(() => {
+                    if (this.selectID.length > 0) {
+                        sellWorks(params, res => {
+                            if (res === 204) {
+                                this.$message.success(`${one? '': '批量'}${sellable ? '启用' : '禁用'}成功！`)
+                                this.find()
+                                this.selectID = []
+                            }
+                        })
+                    }
+                }).catch(() => {
+                })
             },
-            handleDelete() {
-              this.deleteVisible = true
+            //分页
+            handleSizeChange(pageSize) {
+                this.pageSize = pageSize
+                this.find()
+            },
+            handleCurrentChange(page) {
+                this.page = page
+                this.find()
+            },
+            handleDelete(id) {
+                this.$confirm(`确定是否确定删除该作品?吗?`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(() => {
+                    delelteWorks({id: id}, res => {
+                        if (res === 204) {
+                            this.$message.success("删除成功！")
+                            this.find()
+                        }
+                    })
+                }).catch(() => {
+                })
             },
             handleShow(id) {
                 console.log(id)
-                // this.createVisible = true
-                this.$router.push({name: 'userCameramanShow'})
+                this.$router.push({name: 'userCameramanShow', params: {id: id}})
             },
         }
     }
 </script>
 
 <style lang="less" scoped>
-    .labelManage {
-
-        .addButton {
-            margin-top: 20px;
-        }
-
-    }
-    /deep/ .el-dialog {
-        border-radius: 10px;
-
-        .el-dialog__header {
-            font-weight: 600;
-            border-bottom: 1px solid #e4e4e4;
-        }
-        .el-form-item {
-            margin-top: 15px;
-        }
-        .el-form-item:first-child {
-            margin-top: 0px;
-        }
-        .el-dialog__footer {
-            margin-top: 40px;
-        }
-    }
-    /deep/ .optionButton {
-        border: none;
-    }
-
 
 </style>
