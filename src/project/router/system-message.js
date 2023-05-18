@@ -20,7 +20,7 @@ const systemMessage = {
             },
             component: () => import("@/project/views/system-message/list"),
         },{
-            path: "/systemMessage/show",
+            path: "/systemMessage/show/:id",
             name: "systemMessageShow",
             meta: {
                 isShowHeader: true,
@@ -37,7 +37,7 @@ const systemMessage = {
                     },
                     {
                         name: "系统消息详情",
-                        path: "/systemMessage/show",
+                        path: "/systemMessage/show/:id",
                     },
                 ],
                 props: true
@@ -66,6 +66,29 @@ const systemMessage = {
                 ],
             },
             component: () => import("@/project/views/system-message/create"),
+        },{
+            path: "/systemMessage/add/:id",
+            name: "systemMessageAdd",
+            meta: {
+                isShowHeader: true,
+                isShowLeftSider: true,
+                keepAlive: false,
+                breadcrumb: [
+                    {
+                        name: "消息管理",
+                        path: "",
+                    },
+                    {
+                        name: "系统消息管理",
+                        path: "/systemMessage/list",
+                    },
+                    {
+                        name: "新建推送",
+                        path: "/systemMessage/add/:id",
+                    },
+                ],
+            },
+            component: () => import("@/project/views/system-message/add"),
         },
     ],
 }

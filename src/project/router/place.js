@@ -20,7 +20,7 @@ const place = {
             },
             component: () => import("@/project/views/place/list"),
         },{
-            path: "/place/show",
+            path: "/place/show/:id",
             name: "placeShow",
             meta: {
                 isShowHeader: true,
@@ -37,7 +37,7 @@ const place = {
                     },
                     {
                         name: "场地作品详情",
-                        path: "/place/show",
+                        path: "/place/show/:id",
                     },
                 ],
             },

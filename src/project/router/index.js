@@ -17,7 +17,7 @@ import modelAudit from "./model-audit";
 import cameramanAudit from "./cameraman-audit"
 import placeAudit from "./place-audit";
 import worksStyle from "./works-style";
-import worksClothing from "./works-clothing"
+import worksClothing from "./works-classify"
 import systemArticle from "./system-article";
 import helpArticle from "./help-article";
 import feedback from "./feedback";

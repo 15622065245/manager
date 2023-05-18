@@ -45,7 +45,7 @@ const user = {
             component: () => import("@/project/views/user/show"),
         },
         {
-            path: "/user/show/model/show",
+            path: "/user/show/model/show/:id",
             name: "userModelShow",
             meta: {
                 isShowHeader: true,
@@ -61,10 +61,6 @@ const user = {
                         path: "/user/list",
                     },
                     {
-                        name: "用户详情",
-                        path: "/user/show",
-                    },
-                    {
                         name: "作品详情",
                         path: "/user/show",
                     },
@@ -73,7 +69,7 @@ const user = {
             component: () => import("@/project/views/user/components/model/show"),
         },
         {
-            path: "/user/show/cameraman/show",
+            path: "/user/show/cameraman/show/:id",
             name: "userCameramanShow",
             meta: {
                 isShowHeader: true,
@@ -89,19 +85,15 @@ const user = {
                         path: "/user/list",
                     },
                     {
-                        name: "用户详情",
-                        path: "/user/show",
-                    },
-                    {
                         name: "作品详情",
-                        path: "/cameraman/show",
+                        path: "/cameraman/show/:id",
                     },
                 ],
             },
             component: () => import("@/project/views/user/components/cameraman/show"),
         },
         {
-            path: "/user/show/place/show",
+            path: "/user/show/place/show/:id",
             name: "userPlaceShow",
             meta: {
                 isShowHeader: true,
@@ -117,12 +109,8 @@ const user = {
                         path: "/user/list",
                     },
                     {
-                        name: "用户详情",
-                        path: "/user/show",
-                    },
-                    {
                         name: "作品详情",
-                        path: "/place/show",
+                        path: "/place/show/:id",
                     },
                 ],
             },

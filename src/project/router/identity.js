@@ -20,7 +20,7 @@ const identity = {
             },
             component: () => import("@/project/views/identity/list"),
         },{
-            path: "/identity/show",
+            path: "/identity/show/:id",
             name: "identityShow",
             meta: {
                 isShowHeader: true,
@@ -37,7 +37,7 @@ const identity = {
                     },
                     {
                         name: "身份认证详情",
-                        path: "/identity/show",
+                        path: "/identity/show/:id",
                     },
                 ],
             },

@@ -20,7 +20,7 @@ const modelAudit = {
             },
             component: () => import("@/project/views/model-audit/list"),
         },{
-            path: "/modelAudit/show",
+            path: "/modelAudit/show/:id",
             name: "modelAuditShow",
             meta: {
                 isShowHeader: true,
@@ -37,7 +37,7 @@ const modelAudit = {
                     },
                     {
                         name: "模特作品详情",
-                        path: "/modelAudit/show",
+                        path: "/modelAudit/show/:id",
                     },
                 ],
             },

@@ -20,7 +20,7 @@ const cameraman = {
             },
             component: () => import("@/project/views/cameraman-audit/list"),
         },{
-            path: "/cameramanAudit/show",
+            path: "/cameramanAudit/show/:id",
             name: "cameramanAuditShow",
             meta: {
                 isShowHeader: true,
@@ -37,7 +37,7 @@ const cameraman = {
                     },
                     {
                         name: "摄影师作品详情",
-                        path: "/cameramanAudit/show",
+                        path: "/cameramanAudit/show/:id",
                     },
                 ],
             },
