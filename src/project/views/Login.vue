@@ -90,14 +90,12 @@ export default {
             findMyModule({},res => {
               localStorage.setItem("menuList", JSON.stringify(res))
 
+              findWithMe({}, res =>{
+                sessionStorage.setItem('console_cache', JSON.stringify(res))
+                this.$store.dispatch("getUser", res)
+                this.$router.push("/account/list")
+              })
             })
-            findWithMe({}, res =>{
-              console.log("个人信息", res)
-              sessionStorage.setItem('console_cache', JSON.stringify(res))
-              this.$store.dispatch("getUser", res)
-              this.$router.push("/account/list")
-            })
-
           })
           // authenticateByUsernameAndPassword(param, res => {
           //   sessionStorage.setItem('console_token', res)
